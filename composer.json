@@ -1,0 +1,26 @@
+{
+  "name": "flyerclub/rr-symfony-workers",
+  "description": "Symfony roadrunner worker bundle",
+  "license": "MIT",
+  "type": "symfony-bundle",
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "authors": [
+    {
+      "name": "yalop",
+      "email": "email@example.com"
+    }
+  ],
+  "require": {
+    "php": "^8.4",
+    "symfony/config": "^6.4 || ^7.0 || ^8.0",
+    "symfony/http-client": "^6.4 || ^7.0 || ^8.0",
+    "symfony/framework-bundle": "^6.4 || ^7.0 || ^8.0",
+    "spiral/roadrunner-grpc": "^3.5.2"
+  },
+  "autoload": {
+    "psr-4": {
+      "Rr\\Bundle\\Workers\\": "src"
+    }
+  }
+}
