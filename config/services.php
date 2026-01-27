@@ -68,6 +68,6 @@ return static function (ContainerConfigurator $container) {
     $services->set(WorkerStorageInterface::class, WorkerStorage::class)->public();
     $services->get(WorkerStorageInterface::class)->call('registerWorker', [
         Environment\Mode::MODE_HTTP,
-        service(HttpWorker::class)
+        service(InternalHttpWorker::class)
     ]);
 };
