@@ -10,7 +10,7 @@ use Rr\Bundle\Workers\Traits\ErrorRenderer;
 use Rr\Bundle\Workers\Traits\GeneratorConsumes;
 use Symfony\Component\HttpKernel\KernelInterface;
 
-final readonly class HttpWorker implements WorkerInterface
+final class HttpWorker implements WorkerInterface
 {
     use ErrorRenderer;
     use GeneratorConsumes;
