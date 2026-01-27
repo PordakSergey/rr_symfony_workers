@@ -13,14 +13,29 @@
   ],
   "require": {
     "php": "^8.4",
-    "symfony/config": "^6.4 || ^7.0 || ^8.0",
-    "symfony/http-client": "^6.4 || ^7.0 || ^8.0",
-    "symfony/framework-bundle": "^6.4 || ^7.0 || ^8.0",
-    "spiral/roadrunner-grpc": "^3.5.2"
+    "symfony/config": "^7.0 || ^8.0",
+    "symfony/dependency-injection": "^7.0 || ^8.0",
+    "symfony/yaml": "^7.0 || ^8.0",
+    "symfony/http-client": "^7.0 || ^8.0",
+    "symfony/framework-bundle": "^7.0 || ^8.0",
+    "symfony/runtime": "^7.0 || ^8.0",
+    "spiral/roadrunner": "^2025.1.0",
+    "spiral/roadrunner-worker": "^3.0.0",
+    "spiral/goridge": "^4.0",
+    "spiral/roadrunner-http": "^3.6",
+    "spiral/roadrunner-grpc": "^3.5.2",
+    "spiral/roadrunner-kv": "^4.0",
+    "spiral/roadrunner-jobs": "^4.7",
+    "nyholm/psr7": "^1.8"
   },
   "autoload": {
     "psr-4": {
       "Rr\\Bundle\\Workers\\": "src"
+    }
+  },
+  "config": {
+    "allow-plugins": {
+      "symfony/runtime": true
     }
   }
 }
