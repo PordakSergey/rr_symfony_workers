@@ -26,7 +26,7 @@ return static function (ContainerConfigurator $container) {
         ->private();
 
     $services
-        ->load('Rr\\Bundle\\Workers\\', dirname(__DIR__ ).'/../src/')
+        ->load('Rr\\Bundle\\Workers\\', realpath(__DIR__ . '/../src').'/')
         ->public();
 
     // RoadRuner
