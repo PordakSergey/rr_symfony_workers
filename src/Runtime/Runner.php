@@ -27,6 +27,7 @@ class Runner implements RunnerInterface
         $_SERVER['APP_RUNTIME_MODE'] = \sprintf('web=%d&worker=1', $this->mode === Mode::MODE_HTTP ? 1 : 0);
 
         $this->kernel->boot();
+        /* @var $registry WorkerStorageInterface */
         $registry = $this->kernel->getContainer()->get(WorkerStorageInterface::class);
         $worker = $registry->getWorker($this->mode);
 
