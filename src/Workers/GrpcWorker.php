@@ -11,4 +11,9 @@ final class GrpcWorker implements WorkerInterface
     {
 
     }
+
+    public static function supports(string $name): bool
+    {
+        return true;
+    }
 }

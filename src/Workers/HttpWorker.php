@@ -3,12 +3,13 @@
 namespace Rr\Bundle\Workers\Workers;
 
 use Psr\Log\LoggerInterface;
-use Rr\Bundle\Workers\Contracts\Http\RequestHandlerInterface;
+use Rr\Bundle\Workers\Contracts\Handlers\RequestHandlerInterface;
 use Rr\Bundle\Workers\Contracts\RoadRunnerBridge\HttpFoundationWorkerInterface;
 use Rr\Bundle\Workers\Contracts\Workers\WorkerInterface;
 use Rr\Bundle\Workers\Traits\ErrorRenderer;
 use Rr\Bundle\Workers\Traits\GeneratorConsumes;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Spiral\RoadRunner\Environment;
 
 final class HttpWorker implements WorkerInterface
 {
@@ -56,5 +57,14 @@ final class HttpWorker implements WorkerInterface
                 $this->httpFoundationWorker->getWorker()->stop();
             }
         }
+    }
+
+    /**
+     * @param string $name
+     * @return bool
+     */
+    public static function supports(string $name): bool
+    {
+        return $name == Environment\Mode::MODE_HTTP;
     }
 }

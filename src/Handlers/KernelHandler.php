@@ -1,8 +1,8 @@
 <?php
 
-namespace Rr\Bundle\Workers\Http;
+namespace Rr\Bundle\Workers\Handlers;
 
-use Rr\Bundle\Workers\Contracts\Http\RequestHandlerInterface;
+use Rr\Bundle\Workers\Contracts\Handlers\RequestHandlerInterface;
 use Rr\Bundle\Workers\Helpers\BasicAuthHandler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Rr\Bundle\Workers\Contracts\Http;
+namespace Rr\Bundle\Workers\Contracts\Handlers;
 
 use Symfony\Component\HttpFoundation\Request;
 

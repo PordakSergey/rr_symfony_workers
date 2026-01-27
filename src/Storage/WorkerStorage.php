@@ -7,20 +7,8 @@ use Rr\Bundle\Workers\Contracts\Workers\WorkerInterface;
 
 final class WorkerStorage implements WorkerStorageInterface
 {
-    /**
-     * @var array
-     */
-    private array $workers = [];
-
-    /**
-     * @param string $mode
-     * @param WorkerInterface $worker
-     * @return void
-     */
-    public function registerWorker(string $mode, WorkerInterface $worker): void
-    {
-        $this->workers[$mode] = $worker;
-    }
+    /** @var iterable<WorkerInterface> */
+    public function __construct(private iterable $workers) {}
 
     /**
      * @param string $mode
@@ -28,6 +16,11 @@ final class WorkerStorage implements WorkerStorageInterface
      */
     public function getWorker(string $mode): ?WorkerInterface
     {
-        return $this->workers[$mode] ?? null;
+        foreach ($this->workers as $worker) {
+            if ($worker::supports($mode)) {
+                return $worker;
+            }
+        }
+        return null;
     }
 }
