@@ -46,6 +46,6 @@ final class JobsWorker implements WorkerInterface
      */
     public static function supports(string $name): bool
     {
-        return $name == Environment\Mode::MODE_HTTP;
+        return $name == Environment\Mode::MODE_JOBS;
     }
 }
