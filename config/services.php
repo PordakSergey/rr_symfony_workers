@@ -12,7 +12,6 @@ use Spiral\RoadRunner\Http\HttpWorkerInterface;
 use Spiral\RoadRunner\Jobs\ConsumerInterface;
 use Spiral\RoadRunner\Worker as RoadRunnerWorker;
 use Spiral\RoadRunner\WorkerInterface as RoadRunnerWorkerInterface;
-use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\tagged_iterator;
@@ -25,7 +24,8 @@ return static function (ContainerConfigurator $container) {
     $services = $container->services()->defaults()
         ->autowire()
         ->autoconfigure()
-        ->private();
+        ->private()
+        ->bind('iterable $workers',  tagged_iterator('rr.worker'));
 
     // RoadRuner
     $services->set(EnvironmentInterface::class)
@@ -53,11 +53,6 @@ return static function (ContainerConfigurator $container) {
     $services
         ->instanceof(WorkerInterface::class)
         ->tag('rr.worker');
-
-    $services->set(WorkerStorage::class)
-        ->args([
-            'iterable $workers' => tagged_iterator('rr.worker'),
-        ])->public();
 
     $services->alias(WorkerStorageInterface::class, WorkerStorage::class)->public();
 };
