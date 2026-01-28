@@ -7,17 +7,16 @@ use Spiral\RoadRunner\Environment\Mode;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Runtime\RunnerInterface;
 
-class Runner implements RunnerInterface
+readonly class Runner implements RunnerInterface
 {
     /**
      * @param KernelInterface $kernel
-     * @param WorkerStorageInterface $workerStorage
      * @param string $mode
      */
     public function __construct(
-        private readonly KernelInterface $kernel,
-        private WorkerStorageInterface   $workerStorage,
-        private string                   $mode)
+        private KernelInterface $kernel,
+        private string          $mode
+    )
     {
     }
 
@@ -29,7 +28,8 @@ class Runner implements RunnerInterface
         $_SERVER['APP_RUNTIME_MODE'] = \sprintf('web=%d&worker=1', $this->mode === Mode::MODE_HTTP ? 1 : 0);
 
         $this->kernel->boot();
-        $worker = $this->workerStorage->getWorker($this->mode);
+        $workerStorage = $this->kernel->getContainer()->get(WorkerStorageInterface::class);
+        $worker = $workerStorage->getWorker($this->mode);
 
         if ($worker === null) {
             error_log(\sprintf('Missing RR worker implementation for %s mode', $this->mode));
