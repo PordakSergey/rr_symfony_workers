@@ -15,6 +15,7 @@ use Spiral\RoadRunner\WorkerInterface as RoadRunnerWorkerInterface;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
+use function Symfony\Component\DependencyInjection\Loader\Configurator\tagged_iterator;
 
 return static function (ContainerConfigurator $container) {
     // params
@@ -55,7 +56,7 @@ return static function (ContainerConfigurator $container) {
 
     $services->set(WorkerStorage::class)
         ->args([
-            '$workers' => new TaggedIteratorArgument('rr.worker'),
+            'iterable $workers' => tagged_iterator('rr.worker'),
         ])->public();
 
     $services->alias(WorkerStorageInterface::class, WorkerStorage::class)->public();
