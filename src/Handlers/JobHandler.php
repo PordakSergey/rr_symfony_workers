@@ -26,7 +26,7 @@ final class JobHandler implements JobHandlerInterface
         $taskClass = $task->getName();
         $command = new $taskClass();
         if ($command instanceof JobCommandInterface) {
-            $command->setPayload(json_decode($task->getPayload()));
+            $command->setPayload(json_decode($task->getPayload(), true));
             $this->messageBus->dispatch($command);
         }
     }
