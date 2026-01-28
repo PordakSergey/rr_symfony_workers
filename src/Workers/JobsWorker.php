@@ -25,12 +25,7 @@ final class JobsWorker implements WorkerInterface
     {
         while ($task = $this->worker->getConsumer()->waitTask()) {
             try {
-                $name = $task->getName();
-                $payload = json_decode($task->getPayload(), true);
-                $meta = $task->getHeaders() ?? [];
-
-                $this->handler->handle($name, $payload, $meta);
-
+                $this->handler->handle($task);
                 $task->ack();
             } catch (\Throwable $e) {
                 $task->nack($e::class.': '.$e->getMessage());
