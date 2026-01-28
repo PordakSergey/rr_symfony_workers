@@ -54,5 +54,10 @@ return static function (ContainerConfigurator $container) {
         ->instanceof(WorkerInterface::class)
         ->tag('rr.worker');
 
+    $services->set(\Rr\Bundle\Workers\Workers\JobsWorker::class)
+        ->autowire()
+        ->tag('rr.worker')
+        ->public();
+
     $services->alias(WorkerStorageInterface::class, WorkerStorage::class)->public();
 };
