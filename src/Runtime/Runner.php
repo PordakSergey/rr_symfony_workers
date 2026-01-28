@@ -7,17 +7,27 @@ use Spiral\RoadRunner\Environment\Mode;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Runtime\RunnerInterface;
 
-readonly class Runner implements RunnerInterface
+class Runner implements RunnerInterface
 {
+    private string $mode;
+
     /**
      * @param KernelInterface $kernel
      * @param string $mode
      */
     public function __construct(
-        private KernelInterface $kernel,
-        private string          $mode
+        private KernelInterface $kernel
     )
     {
+    }
+
+    /**
+     * @param string $mode
+     * @return void
+     */
+    public function setMode(string $mode): void
+    {
+        $this->mode = $mode;
     }
 
     /**
