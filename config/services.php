@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigura
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 
 return static function (ContainerConfigurator $container) {
-    /* params */
+    // params
     $container->parameters()
         ->set('intercept_side_effect', true);
 
@@ -43,7 +43,7 @@ return static function (ContainerConfigurator $container) {
 
     $services->set(ConsumerInterface::class, \Spiral\RoadRunner\Jobs\Consumer::class);
 
-    /* autoload */
+    // autoload
     $services
         ->load('Rr\\Bundle\\Workers\\', realpath(__DIR__ . '/../src').'/')
         ->public();
