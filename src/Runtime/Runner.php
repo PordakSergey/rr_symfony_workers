@@ -13,7 +13,6 @@ class Runner implements RunnerInterface
 
     /**
      * @param KernelInterface $kernel
-     * @param string $mode
      */
     public function __construct(
         private KernelInterface $kernel
