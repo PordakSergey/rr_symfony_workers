@@ -22,14 +22,15 @@ class Configuration implements ConfigurationInterface
         $root
             ->info('https://github.com/PordakSergey/rr_symfony_workers')
             ->children()
-                ->arrayNode("workers")
+                ->arrayNode("kv")
                     ->addDefaultsIfNotSet()
-                    ->info('Roadrunner workers')
                     ->children()
-                        ->arrayNode('http')->children()
-                            ->booleanNode("enabled")->info('Enable http worker')->defaultTrue()->end()
-                        ->arrayNode('grpc')->children()
-                            ->booleanNode("enabled")->info('Enable Grpc worker')->defaultTrue()->end()
+                        ->arrayNode('storages')
+                            ->defaultValue([])
+                            ->scalarPrototype()->end()
+                        ->end()
+                    ->end()
+                ->end()
         ;
 
         return $builder;
