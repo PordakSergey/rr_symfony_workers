@@ -3,6 +3,7 @@
 use Rr\Bundle\Workers\Contracts\Storage\WorkerStorageInterface;
 use Rr\Bundle\Workers\Contracts\Workers\WorkerInterface;
 use Rr\Bundle\Workers\Factories\RPCFactory;
+use Rr\Bundle\Workers\Storage\WorkerStorage;
 use Spiral\Goridge\RPC\RPCInterface;
 use Spiral\RoadRunner\Environment;
 use Spiral\RoadRunner\EnvironmentInterface;
@@ -52,7 +53,9 @@ return static function (ContainerConfigurator $container) {
         ->instanceof(WorkerInterface::class)
         ->tag('rr.worker');
 
-    $services->set(WorkerStorageInterface::class)
-        ->args([new TaggedIteratorArgument('rr.worker')])
+    $services->set(WorkerStorageInterface::class, WorkerStorage::class)
+        ->args([
+            '$workers' => new TaggedIteratorArgument('rr.worker'),
+        ])
         ->public();
 };
