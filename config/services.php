@@ -8,6 +8,7 @@ use Spiral\RoadRunner\Environment;
 use Spiral\RoadRunner\EnvironmentInterface;
 use Spiral\RoadRunner\Http\HttpWorker;
 use Spiral\RoadRunner\Http\HttpWorkerInterface;
+use Spiral\RoadRunner\Jobs\ConsumerInterface;
 use Spiral\RoadRunner\Worker as RoadRunnerWorker;
 use Spiral\RoadRunner\WorkerInterface as RoadRunnerWorkerInterface;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
@@ -19,15 +20,10 @@ return static function (ContainerConfigurator $container) {
     $container->parameters()
         ->set('intercept_side_effect', true);
 
-    /* autoload */
     $services = $container->services()->defaults()
         ->autowire()
         ->autoconfigure()
         ->private();
-
-    $services
-        ->load('Rr\\Bundle\\Workers\\', realpath(__DIR__ . '/../src').'/')
-        ->public();
 
     // RoadRuner
     $services->set(EnvironmentInterface::class)
@@ -43,6 +39,13 @@ return static function (ContainerConfigurator $container) {
     $services->set(RPCInterface::class)
         ->factory([RPCFactory::class, 'fromEnvironment'])
         ->args([service(EnvironmentInterface::class)]);
+
+    $services->set(ConsumerInterface::class, \Spiral\RoadRunner\Jobs\Consumer::class);
+
+    /* autoload */
+    $services
+        ->load('Rr\\Bundle\\Workers\\', realpath(__DIR__ . '/../src').'/')
+        ->public();
 
     // Bundle
     $services
