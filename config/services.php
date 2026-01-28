@@ -53,9 +53,10 @@ return static function (ContainerConfigurator $container) {
         ->instanceof(WorkerInterface::class)
         ->tag('rr.worker');
 
-    $services->set(WorkerStorageInterface::class, WorkerStorage::class)
+    $services->set(WorkerStorage::class)
         ->args([
             '$workers' => new TaggedIteratorArgument('rr.worker'),
-        ])
-        ->public();
+        ])->public();
+
+    $services->alias(WorkerStorageInterface::class, WorkerStorage::class)->public();
 };
