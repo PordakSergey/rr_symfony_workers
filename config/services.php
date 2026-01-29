@@ -7,8 +7,11 @@ use Rr\Bundle\Workers\Storage\WorkerStorage;
 use Spiral\Goridge\RPC\RPCInterface;
 use Spiral\RoadRunner\Environment;
 use Spiral\RoadRunner\EnvironmentInterface;
+use Spiral\RoadRunner\GRPC\Invoker;
+use Spiral\RoadRunner\GRPC\InvokerInterface;
 use Spiral\RoadRunner\Http\HttpWorker;
 use Spiral\RoadRunner\Http\HttpWorkerInterface;
+use Spiral\RoadRunner\Jobs\Consumer;
 use Spiral\RoadRunner\Jobs\ConsumerInterface;
 use Spiral\RoadRunner\Worker as RoadRunnerWorker;
 use Spiral\RoadRunner\WorkerInterface as RoadRunnerWorkerInterface;
@@ -42,7 +45,8 @@ return static function (ContainerConfigurator $container) {
         ->factory([RPCFactory::class, 'fromEnvironment'])
         ->args([service(EnvironmentInterface::class)]);
 
-    $services->set(ConsumerInterface::class, \Spiral\RoadRunner\Jobs\Consumer::class);
+    $services->set(ConsumerInterface::class, Consumer::class);
+    $services->set(InvokerInterface::class, Invoker::class);
 
     // autoload
     $services

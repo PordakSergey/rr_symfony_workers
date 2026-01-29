@@ -6,7 +6,7 @@ use Psr\Log\LoggerInterface;
 use Rr\Bundle\Workers\Contracts\Workers\WorkerInterface;
 use Rr\Bundle\Workers\Storage\GrpcServiceStorage;
 use Spiral\RoadRunner\Environment;
-use Spiral\RoadRunner\GRPC\Invoker;
+use Spiral\RoadRunner\GRPC\InvokerInterface;
 use Spiral\RoadRunner\GRPC\Server;
 use Spiral\RoadRunner\WorkerInterface as RoadrunnerWorker;
 
@@ -17,7 +17,7 @@ final class GrpcWorker implements WorkerInterface
     public function __construct(
         private GrpcServiceStorage $storage,
         private LoggerInterface $logger,
-        private Invoker $invoker,
+        private InvokerInterface $invoker,
         private RoadrunnerWorker $roadRunnerWorker,
     )
     {
