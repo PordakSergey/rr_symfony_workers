@@ -56,6 +56,7 @@ return static function (ContainerConfigurator $container) {
 
     $services->set(\Rr\Bundle\Workers\Workers\JobsWorker::class)->autowire()->public()->tag('rr.worker');
     $services->set(\Rr\Bundle\Workers\Workers\HttpWorker::class)->autowire()->public()->tag('rr.worker');
+    $services->set(\Rr\Bundle\Workers\Workers\GrpcWorker::class)->autowire()->public()->tag('rr.worker');
 
     $services->alias(WorkerStorageInterface::class, WorkerStorage::class)->public();
 };
