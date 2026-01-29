@@ -6,6 +6,7 @@ namespace Rr\Bundle\Workers\DependencyInjection;
 use Rr\Bundle\Workers\Cache\KvCacheAdapter;
 use Spiral\Goridge\RPC\RPC;
 use Spiral\Goridge\RPC\RPCInterface;
+use Spiral\RoadRunner\GRPC\ServiceInterface;
 use Spiral\RoadRunner\KeyValue\Factory;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Config\FileLocator;
@@ -33,6 +34,11 @@ class RrWorkersExtension extends Extension
 
         if (!empty($config['kv']['storages'])) {
             $this->configureKv($config, $container);
+        }
+
+        if (interface_exists(ServiceInterface::class)) {
+            $container->registerForAutoconfiguration(ServiceInterface::class)
+                ->addTag('roadrunner.grpc_service');
         }
     }
 
