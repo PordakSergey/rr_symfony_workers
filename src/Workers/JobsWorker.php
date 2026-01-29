@@ -5,13 +5,14 @@ namespace Rr\Bundle\Workers\Workers;
 use Rr\Bundle\Workers\Contracts\Handlers\JobHandlerInterface;
 use Rr\Bundle\Workers\Contracts\RoadRunnerBridge\JobsFoundationWorkerInterface;
 use Rr\Bundle\Workers\Contracts\Workers\WorkerInterface;
+use Spiral\RoadRunner\Jobs\ConsumerInterface;
 use Symfony\Contracts\Service\ResetInterface;
 use Spiral\RoadRunner\Environment;
 
 final class JobsWorker implements WorkerInterface
 {
     public function __construct(
-        private JobsFoundationWorkerInterface $worker,
+        private ConsumerInterface $consumer,
         private JobHandlerInterface $handler,
         private ?ResetInterface $reset = null,
     )
