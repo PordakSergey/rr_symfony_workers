@@ -14,6 +14,12 @@ final class GrpcWorker implements WorkerInterface
 {
     private Server $server;
 
+    /**
+     * @param GrpcServiceStorage $storage
+     * @param LoggerInterface $logger
+     * @param InvokerInterface $invoker
+     * @param RoadrunnerWorker $roadRunnerWorker
+     */
     public function __construct(
         private GrpcServiceStorage $storage,
         private LoggerInterface $logger,

@@ -10,6 +10,9 @@ use Symfony\Component\Messenger\MessageBusInterface;
 
 final class JobHandler implements JobHandlerInterface
 {
+    /**
+     * @param MessageBusInterface $messageBus
+     */
     public function __construct(
         protected MessageBusInterface $messageBus,
     )

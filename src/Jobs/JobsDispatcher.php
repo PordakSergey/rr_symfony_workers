@@ -12,6 +12,10 @@ use Spiral\RoadRunner\Jobs\Options;
 
 class JobsDispatcher
 {
+    /**
+     * @param RPCFactory $rpcFactory
+     * @param LoggerInterface $logger
+     */
     public function __construct(
         private RPCFactory      $rpcFactory,
         private LoggerInterface $logger,

@@ -7,6 +7,10 @@ use Symfony\Component\Runtime\RunnerInterface;
 use Symfony\Component\Runtime\SymfonyRuntime;
 class Runtime extends SymfonyRuntime
 {
+    /**
+     * @param object|null $application
+     * @return RunnerInterface
+     */
     public function getRunner(?object $application) : RunnerInterface
     {
         if ($application instanceof KernelInterface && false !== getenv('RR_MODE')) {

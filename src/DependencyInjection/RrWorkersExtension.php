@@ -42,6 +42,11 @@ class RrWorkersExtension extends Extension
         }
     }
 
+    /**
+     * @param array $config
+     * @param ContainerBuilder $container
+     * @return void
+     */
     public function configureKv(array $config, ContainerBuilder $container): void
     {
         if (!class_exists(Factory::class)) {
