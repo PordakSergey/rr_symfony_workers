@@ -8,6 +8,7 @@ use Rr\Bundle\Workers\Contracts\RoadRunnerBridge\HttpFoundationWorkerInterface;
 use Rr\Bundle\Workers\Contracts\Workers\WorkerInterface;
 use Rr\Bundle\Workers\Event\WorkerStartEvent;
 use Rr\Bundle\Workers\Event\WorkerStopEvent;
+use Rr\Bundle\Workers\Handlers\MiddlewareStackHandler;
 use Rr\Bundle\Workers\Traits\ErrorRenderer;
 use Rr\Bundle\Workers\Traits\GeneratorConsumes;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -29,7 +30,7 @@ final class HttpWorker implements WorkerInterface
     public function __construct(
         private KernelInterface $kernel,
         private HttpFoundationWorkerInterface $httpFoundationWorker,
-        private RequestHandlerInterface $requestHandler,
+        private MiddlewareStackHandler $requestHandler,
         private LoggerInterface $logger,
         private EventDispatcherInterface $eventDispatcher,
     )

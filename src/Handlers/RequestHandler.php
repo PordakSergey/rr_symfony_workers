@@ -9,7 +9,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\TerminableInterface;
 
-final class KernelHandler implements RequestHandlerInterface
+final class RequestHandler implements RequestHandlerInterface
 {
     private \Closure $startTimeReset;
 

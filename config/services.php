@@ -3,6 +3,7 @@
 use Rr\Bundle\Workers\Contracts\Storage\WorkerStorageInterface;
 use Rr\Bundle\Workers\Contracts\Workers\WorkerInterface;
 use Rr\Bundle\Workers\Factories\RPCFactory;
+use Rr\Bundle\Workers\Middlewares\DoctrineORMMiddleware;
 use Rr\Bundle\Workers\Storage\WorkerStorage;
 use Spiral\Goridge\RPC\RPCInterface;
 use Spiral\RoadRunner\Environment;
@@ -22,7 +23,20 @@ use function Symfony\Component\DependencyInjection\Loader\Configurator\tagged_it
 return static function (ContainerConfigurator $container) {
     // params
     $container->parameters()
-        ->set('intercept_side_effect', true);
+        ->set('intercept_side_effect', true)
+        ->set('middlewares.default', [
+            'before' => [
+                service(DoctrineORMMiddleware::class)
+            ],
+            'after' => [],
+        ])
+        ->set('interceptors.default', [
+            'before' => [
+                service(DoctrineORMMiddleware::class)
+            ],
+            'after' => [],
+        ])
+    ;
 
     $services = $container->services()->defaults()
         ->autowire()
@@ -52,7 +66,7 @@ return static function (ContainerConfigurator $container) {
     $services
         ->load('Rr\\Bundle\\Workers\\', realpath(__DIR__ . '/../src').'/')
         ->public();
-
+    
     // Bundle
     $services
         ->instanceof(WorkerInterface::class)
