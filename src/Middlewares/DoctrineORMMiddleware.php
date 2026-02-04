@@ -5,10 +5,13 @@ namespace Rr\Bundle\Workers\Middlewares;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
+use Rr\Bundle\Workers\Contracts\Middlewares\MiddlewareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\VarExporter\LazyObjectInterface;
 
-class DoctrineORMMiddleware
+class DoctrineORMMiddleware implements MiddlewareInterface
 {
     public function __construct(
         protected ManagerRegistry    $registry,
@@ -42,7 +45,7 @@ class DoctrineORMMiddleware
     /**
      * @return void
      */
-    private function postRequest(): void
+    private function postResponse(): void
     {
         $managerNames = $this->registry->getManagerNames();
 
@@ -83,5 +86,20 @@ class DoctrineORMMiddleware
         } catch (\Exception | \Doctrine\DBAL\Exception) {
             return false;
         }
+    }
+
+    /**
+     * @param Request $request
+     * @param HttpKernelInterface $next
+     * @return \Iterator
+     * @throws \Exception
+     */
+    public function process(Request $request, HttpKernelInterface $next): \Iterator
+    {
+        $this->preRequest();
+
+        yield $next->handle($request);
+
+        $this->postResponse();
     }
 }
