@@ -2,8 +2,8 @@
 
 namespace Rr\Bundle\Workers\Handlers;
 
-use Baldinof\RoadRunnerBundle\Http\MiddlewareInterface;
 use Rr\Bundle\Workers\Contracts\Handlers\RequestHandlerInterface;
+use Rr\Bundle\Workers\Contracts\Middlewares\MiddlewareInterface;
 use Rr\Bundle\Workers\Http\HttpKernelRunner;
 use Symfony\Component\HttpFoundation\Request;
 
