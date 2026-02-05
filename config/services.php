@@ -3,6 +3,7 @@
 use Rr\Bundle\Workers\Contracts\Storage\WorkerStorageInterface;
 use Rr\Bundle\Workers\Contracts\Workers\WorkerInterface;
 use Rr\Bundle\Workers\Factories\RPCFactory;
+use Rr\Bundle\Workers\Handlers\RequestHandler;
 use Rr\Bundle\Workers\Middlewares\DoctrineORMMiddleware;
 use Rr\Bundle\Workers\Storage\WorkerStorage;
 use Spiral\Goridge\RPC\RPCInterface;
@@ -77,4 +78,5 @@ return static function (ContainerConfigurator $container) {
     $services->set(\Rr\Bundle\Workers\Workers\GrpcWorker::class)->autowire()->public()->tag('rr.worker');
 
     $services->alias(WorkerStorageInterface::class, WorkerStorage::class)->public();
+    $services->alias(\Rr\Bundle\Workers\Contracts\Handlers\RequestHandlerInterface::class, RequestHandler::class);
 };
