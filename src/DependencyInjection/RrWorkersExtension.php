@@ -3,6 +3,8 @@
 namespace Rr\Bundle\Workers\DependencyInjection;
 
 
+use Baldinof\RoadRunnerBundle\Integration\Doctrine\DoctrineORMMiddleware;
+use Doctrine\Persistence\ManagerRegistry;
 use Rr\Bundle\Workers\Cache\KvCacheAdapter;
 use Spiral\Goridge\RPC\RPC;
 use Spiral\Goridge\RPC\RPCInterface;
@@ -14,6 +16,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
+use Symfony\Component\DependencyInjection\Reference;
 
 class RrWorkersExtension extends Extension
 {
@@ -35,6 +38,11 @@ class RrWorkersExtension extends Extension
         if (!empty($config['kv']['storages'])) {
             $this->configureKv($config, $container);
         }
+
+        $container
+            ->register(DoctrineORMMiddleware::class)
+            ->addArgument(new Reference(ManagerRegistry::class))
+            ->addArgument(new Reference('service_container'));
 
         if (interface_exists(ServiceInterface::class)) {
             $container->registerForAutoconfiguration(ServiceInterface::class)
