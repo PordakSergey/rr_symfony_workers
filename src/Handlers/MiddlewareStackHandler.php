@@ -18,6 +18,10 @@ class MiddlewareStackHandler implements RequestHandlerInterface
 
     }
 
+    /**
+     * @param Request $request
+     * @return \Iterator
+     */
     public function handle(Request $request): \Iterator
     {
         $middlewares = clone $this->middlewares;
@@ -27,5 +31,14 @@ class MiddlewareStackHandler implements RequestHandlerInterface
         yield $runner->handle($request);
 
         $runner->close();
+    }
+
+    /**
+     * @param MiddlewareInterface $middleware
+     * @return void
+     */
+    public function pipe(MiddlewareInterface $middleware): void
+    {
+        $this->middlewares->push($middleware);
     }
 }
