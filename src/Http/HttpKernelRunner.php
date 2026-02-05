@@ -5,10 +5,12 @@ namespace Rr\Bundle\Workers\Http;
 use Rr\Bundle\Workers\Contracts\Handlers\RequestHandlerInterface;
 use Rr\Bundle\Workers\Contracts\Middlewares\MiddlewareInterface;
 use Rr\Bundle\Workers\Traits\GeneratorConsumes;
+use Symfony\Component\DependencyInjection\Attribute\Exclude;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
+#[Exclude]
 class HttpKernelRunner implements HttpKernelInterface
 {
     use GeneratorConsumes;

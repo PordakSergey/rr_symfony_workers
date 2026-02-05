@@ -66,8 +66,6 @@ return static function (ContainerConfigurator $container) {
     // autoload
     $services
         ->load('Rr\\Bundle\\Workers\\', realpath(__DIR__ . '/../src').'/')
-        ->exclude(realpath(__DIR__ . '/../src').'/Http/')
-        ->exclude(realpath(__DIR__ . '/../src').'/Middlewares/')
         ->public();
     
     // Bundle
