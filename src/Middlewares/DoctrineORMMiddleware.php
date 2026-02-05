@@ -6,11 +6,13 @@ use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Rr\Bundle\Workers\Contracts\Middlewares\MiddlewareInterface;
+use Symfony\Component\DependencyInjection\Attribute\Exclude;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\VarExporter\LazyObjectInterface;
 
+#[Exclude]
 class DoctrineORMMiddleware implements MiddlewareInterface
 {
     public function __construct(
