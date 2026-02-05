@@ -3,9 +3,9 @@
 namespace Rr\Bundle\Workers\DependencyInjection;
 
 
-use Baldinof\RoadRunnerBundle\Integration\Doctrine\DoctrineORMMiddleware;
 use Doctrine\Persistence\ManagerRegistry;
 use Rr\Bundle\Workers\Cache\KvCacheAdapter;
+use Rr\Bundle\Workers\Middlewares\DoctrineORMMiddleware;
 use Spiral\Goridge\RPC\RPC;
 use Spiral\Goridge\RPC\RPCInterface;
 use Spiral\RoadRunner\GRPC\ServiceInterface;
