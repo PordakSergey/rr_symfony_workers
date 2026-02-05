@@ -27,16 +27,16 @@ return static function (ContainerConfigurator $container) {
         ->set('intercept_side_effect', true)
         ->set('middlewares.default', [
             'before' => [
-                service(DoctrineORMMiddleware::class)
+                DoctrineORMMiddleware::class
             ],
             'after' => [],
         ])
-        ->set('interceptors.default', [
+        /*->set('interceptors.default', [
             'before' => [
-                service(DoctrineORMMiddleware::class)
+               DoctrineORMMiddleware::class
             ],
             'after' => [],
-        ])
+        ])*/
     ;
 
     $services = $container->services()->defaults()
