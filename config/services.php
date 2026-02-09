@@ -6,12 +6,16 @@ use Rr\Bundle\Workers\Factories\RPCFactory;
 use Rr\Bundle\Workers\Handlers\RequestHandler;
 use Rr\Bundle\Workers\Middlewares\DoctrineORMMiddleware;
 use Rr\Bundle\Workers\Storage\WorkerStorage;
+use Rr\Bundle\Workers\Workers\GrpcWorker;
+use Rr\Bundle\Workers\Workers\HttpWorker;
+use Rr\Bundle\Workers\Workers\JobsWorker;
+use Rr\Bundle\Workers\Workers\TemporalWorker;
 use Spiral\Goridge\RPC\RPCInterface;
 use Spiral\RoadRunner\Environment;
 use Spiral\RoadRunner\EnvironmentInterface;
 use Spiral\RoadRunner\GRPC\Invoker;
 use Spiral\RoadRunner\GRPC\InvokerInterface;
-use Spiral\RoadRunner\Http\HttpWorker;
+use Spiral\RoadRunner\Http\HttpWorker as RoadRunnerHttpWorker;
 use Spiral\RoadRunner\Http\HttpWorkerInterface;
 use Spiral\RoadRunner\Jobs\Consumer;
 use Spiral\RoadRunner\Jobs\ConsumerInterface;
@@ -30,8 +34,7 @@ return static function (ContainerConfigurator $container) {
                 DoctrineORMMiddleware::class
             ],
             'after' => [],
-        ])
-        /*->set('interceptors.default', [
+        ])/*->set('interceptors.default', [
             'before' => [
                DoctrineORMMiddleware::class
             ],
@@ -43,7 +46,7 @@ return static function (ContainerConfigurator $container) {
         ->autowire()
         ->autoconfigure()
         ->private()
-        ->bind('iterable $workers',  tagged_iterator('rr.worker'));
+        ->bind('iterable $workers', tagged_iterator('rr.worker'));
 
     // RoadRuner
     $services->set(EnvironmentInterface::class)
@@ -53,7 +56,7 @@ return static function (ContainerConfigurator $container) {
         ->factory([RoadRunnerWorker::class, 'createFromEnvironment'])
         ->args([service(EnvironmentInterface::class), '%intercept_side_effect%']);
 
-    $services->set(HttpWorkerInterface::class, HttpWorker::class)
+    $services->set(HttpWorkerInterface::class, RoadRunnerHttpWorker::class)
         ->args([service(RoadRunnerWorkerInterface::class)]);
 
     $services->set(RPCInterface::class)
@@ -65,17 +68,18 @@ return static function (ContainerConfigurator $container) {
 
     // autoload
     $services
-        ->load('Rr\\Bundle\\Workers\\', realpath(__DIR__ . '/../src').'/')
+        ->load('Rr\\Bundle\\Workers\\', realpath(__DIR__ . '/../src') . '/')
         ->public();
-    
+
     // Bundle
     $services
         ->instanceof(WorkerInterface::class)
         ->tag('rr.worker');
 
-    $services->set(\Rr\Bundle\Workers\Workers\JobsWorker::class)->autowire()->public()->tag('rr.worker');
-    $services->set(\Rr\Bundle\Workers\Workers\HttpWorker::class)->autowire()->public()->tag('rr.worker');
-    $services->set(\Rr\Bundle\Workers\Workers\GrpcWorker::class)->autowire()->public()->tag('rr.worker');
+    $services->set(JobsWorker::class)->autowire()->public()->tag('rr.worker');
+    $services->set(HttpWorker::class)->autowire()->public()->tag('rr.worker');
+    $services->set(GrpcWorker::class)->autowire()->public()->tag('rr.worker');
+    $services->set(TemporalWorker::class)->autowire()->public()->tag('rr.worker');
 
     $services->alias(WorkerStorageInterface::class, WorkerStorage::class)->public();
     $services->alias(\Rr\Bundle\Workers\Contracts\Handlers\RequestHandlerInterface::class, RequestHandler::class);

@@ -3,7 +3,6 @@
 namespace Rr\Bundle\Workers\Workers;
 
 use Psr\Log\LoggerInterface;
-use Rr\Bundle\Workers\Contracts\Handlers\RequestHandlerInterface;
 use Rr\Bundle\Workers\Contracts\RoadRunnerBridge\HttpFoundationWorkerInterface;
 use Rr\Bundle\Workers\Contracts\Workers\WorkerInterface;
 use Rr\Bundle\Workers\Event\WorkerStartEvent;
@@ -23,7 +22,7 @@ final class HttpWorker implements WorkerInterface
     /**
      * @param KernelInterface $kernel
      * @param HttpFoundationWorkerInterface $httpFoundationWorker
-     * @param RequestHandlerInterface $requestHandler
+     * @param MiddlewareStackHandler $requestHandler
      * @param LoggerInterface $logger
      * @param EventDispatcherInterface $eventDispatcher
      */
