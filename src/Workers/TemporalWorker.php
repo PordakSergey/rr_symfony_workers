@@ -3,6 +3,8 @@
 namespace Rr\Bundle\Workers\Workers;
 
 use Rr\Bundle\Workers\Contracts\Workers\WorkerInterface;
+use Rr\Bundle\Workers\Temporal\DemoActivity;
+use Rr\Bundle\Workers\Temporal\DemoWorkflow;
 use Spiral\RoadRunner\Environment;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Temporal\WorkerFactory;
@@ -28,6 +30,8 @@ final class TemporalWorker implements WorkerInterface
             \Temporal\Worker\WorkerOptions::new()->withMaxConcurrentActivityExecutionSize(10)
         );
 
+        $worker->registerWorkflowTypes(DemoWorkflow::class);
+        $worker->registerActivity(DemoActivity::class);
         $worker->registerActivityFinalizer(fn() => $this->kernel->shutdown());
 
         $factory->run();
