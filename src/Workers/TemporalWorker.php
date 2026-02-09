@@ -39,6 +39,6 @@ final class TemporalWorker implements WorkerInterface
      */
     public static function supports(string $name): bool
     {
-        return $name == Environment\Mode::MODE_HTTP;
+        return $name == Environment\Mode::MODE_TEMPORAL;
     }
 }
