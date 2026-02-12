@@ -3,8 +3,8 @@
 namespace Rr\Bundle\Workers\Workers;
 
 use Rr\Bundle\Workers\Contracts\Workers\WorkerInterface;
-use Rr\Bundle\Workers\Temporal\DemoActivity;
-use Rr\Bundle\Workers\Temporal\DemoWorkflow;
+use Rr\Bundle\Workers\Temporal\Enums\TemporalEntity;
+use Rr\Bundle\Workers\Temporal\Services\Storage\TemporalStorage;
 use Spiral\RoadRunner\Environment;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Temporal\WorkerFactory;
@@ -13,9 +13,9 @@ final class TemporalWorker implements WorkerInterface
 {
     public function __construct(
         private KernelInterface $kernel,
+        private TemporalStorage $storage,
     )
     {
-
     }
 
     /**
@@ -30,10 +30,14 @@ final class TemporalWorker implements WorkerInterface
             \Temporal\Worker\WorkerOptions::new()->withMaxConcurrentActivityExecutionSize(10)
         );
 
-        $worker->registerWorkflowTypes(DemoWorkflow::class);
-        $worker->registerActivity(DemoActivity::class);
-        $worker->registerActivityFinalizer(fn() => $this->kernel->shutdown());
+        foreach ($this->storage->getEntity(TemporalEntity::ACTIVITY) as $activity) {
+            $worker->registerActivity($activity);
+        }
+        foreach ($this->storage->getEntity(TemporalEntity::WORKFLOW) as $workflow) {
+            $worker->registerWorkflowTypes($workflow);
+        }
 
+        $worker->registerActivityFinalizer(fn() => $this->kernel->shutdown());
         $factory->run();
     }
 
