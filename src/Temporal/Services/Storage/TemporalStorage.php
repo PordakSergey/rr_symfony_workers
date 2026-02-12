@@ -12,13 +12,13 @@ class TemporalStorage
     public array $storage = [];
 
     /**
-     * @param string $entityClass
+     * @param object $entityClass
      * @param TemporalEntity $entityType
      * @return void
      */
-    public function setEntityStorage(string $entityClass, TemporalEntity $entityType): void
+    public function setEntityStorage(object $entityClass, TemporalEntity $entityType): void
     {
-        $this->storage[$entityType->value][$entityClass] = $entityClass;
+        $this->storage[$entityType->value][$entityClass::class] = $entityClass;
     }
 
     /**

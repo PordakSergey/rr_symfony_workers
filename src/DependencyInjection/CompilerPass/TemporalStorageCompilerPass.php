@@ -59,7 +59,7 @@ class TemporalStorageCompilerPass implements CompilerPassInterface
                 continue;
             }
 
-            $this->storage->addMethodCall('setEntityStorage', [$class, $entity]);
+            $this->storage->addMethodCall('setEntityStorage', [$this->container->get($class), $entity]);
         }
     }
 }
