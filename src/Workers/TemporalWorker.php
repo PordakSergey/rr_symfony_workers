@@ -31,10 +31,10 @@ final class TemporalWorker implements WorkerInterface
         );
 
         foreach ($this->storage->getEntity(TemporalEntity::ACTIVITY) as $activity) {
-            $worker->registerActivity($activity);
+            $worker->registerActivityImplementations($activity);
         }
         foreach ($this->storage->getEntity(TemporalEntity::WORKFLOW) as $workflow) {
-            $worker->registerWorkflowTypes($workflow);
+            $worker->registerWorkflowTypes($workflow::class);
         }
 
         $worker->registerActivityFinalizer(fn() => $this->kernel->shutdown());
