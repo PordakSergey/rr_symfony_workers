@@ -5,14 +5,13 @@ namespace Rr\Bundle\Workers\DependencyInjection\CompilerPass;
 use ReflectionException;
 use Rr\Bundle\Workers\Temporal\Enums\TemporalEntity;
 use Rr\Bundle\Workers\Temporal\Services\Storage\TemporalStorage;
-use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
 use Temporal\Activity\ActivityInterface;
 use Temporal\Workflow\WorkflowInterface;
 
-#[Autoconfigure(tags: [])]
 class TemporalStorageCompilerPass implements CompilerPassInterface
 {
     private Definition $storage;
@@ -59,7 +58,7 @@ class TemporalStorageCompilerPass implements CompilerPassInterface
                 continue;
             }
 
-            $this->storage->addMethodCall('setEntityStorage', [$this->container->get($id), $entity]);
+            $this->storage->addMethodCall('setEntityStorage', [new Reference($id), $entity]);
         }
     }
 }
