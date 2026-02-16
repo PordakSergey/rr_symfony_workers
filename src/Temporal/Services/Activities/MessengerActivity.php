@@ -32,7 +32,7 @@ class MessengerActivity implements MessengerActivityInterface
     #[ActivityMethod(name: 'dispatch')]
     public function dispatch(string $class, array $payload): Envelope
     {
-        $command = $this->serializer->deserialize($payload, $class, 'json');
+        $command = $this->serializer->deserialize(json_encode($payload), $class, 'json');
 
         return $this->messageBus->dispatch($command);
     }
