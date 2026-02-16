@@ -1,6 +1,7 @@
 <?php
 
 use Rr\Bundle\Workers\Contracts\Handlers\RequestHandlerInterface;
+use Rr\Bundle\Workers\Contracts\Jobs\JobDispatcherInterface;
 use Rr\Bundle\Workers\Contracts\Jobs\JobsHandlerInterface;
 use Rr\Bundle\Workers\Contracts\Storage\WorkerStorageInterface;
 use Rr\Bundle\Workers\Contracts\Workers\WorkerInterface;
@@ -84,6 +85,8 @@ return static function (ContainerConfigurator $container) {
     $services->set(JobsHandlerInterface::class, service(MessengerJobDispatcherHandler::class));
     $services->set(RrJobDispatcher::class)->autowire()->public()->tag('jobs.dispatcher.rr');
     $services->set(TemporalJobDispatcher::class)->autowire()->public()->tag('jobs.dispatcher.temporal');
+
+    $services->set(JobDispatcherInterface::class, service(TemporalJobDispatcher::class));
 
     $services->alias(WorkerStorageInterface::class, WorkerStorage::class)->public();
     $services->alias(RequestHandlerInterface::class, RequestHandler::class);

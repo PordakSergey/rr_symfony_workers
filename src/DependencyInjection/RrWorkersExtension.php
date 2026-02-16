@@ -40,9 +40,9 @@ class RrWorkersExtension extends Extension
             $this->configureKv($config, $container);
         }
 
-        if (!empty($config['jobs']['dispatcher'])) {
+        /*if (!empty($config['jobs']['dispatcher'])) {
             $this->configureJobs($config, $container);
-        }
+        }*/
 
         $container
             ->register(DoctrineORMMiddleware::class)
