@@ -5,6 +5,10 @@ namespace Rr\Bundle\Workers\Temporal\Factories;
 use Rr\Bundle\Workers\Exceptions\BadConfigurationException;
 use Rr\Bundle\Workers\Temporal\Contracts\Services\Client\TemporalClientInterface;
 use Rr\Bundle\Workers\Temporal\Services\Client\TemporalClient;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\Serializer\SerializerInterface;
 
 class TemporalClientFactory
 {
@@ -18,6 +22,10 @@ class TemporalClientFactory
             throw BadConfigurationException::missingTemporalUrl();
         }
 
-        return new TemporalClient($temporalUrl);
+        $encoders = [new JsonEncoder()];
+        $normalizers = [new ObjectNormalizer()];
+        $serializer = new Serializer($normalizers, $encoders);
+
+        return new TemporalClient($temporalUrl, $serializer);
     }
 }

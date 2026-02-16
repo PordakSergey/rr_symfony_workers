@@ -5,7 +5,6 @@ namespace Rr\Bundle\Workers\Temporal\Services\Workflows;
 use Carbon\CarbonInterval;
 use Rr\Bundle\Workers\Temporal\Contracts\Services\Activities\MessengerActivityInterface;
 use Rr\Bundle\Workers\Temporal\Contracts\Services\Workflows\MessengerWorkflowInterface;
-use Symfony\Component\Messenger\Exception\ExceptionInterface;
 use Temporal\Activity\ActivityOptions;
 use Temporal\Workflow;
 use Temporal\Workflow\WorkflowMethod;
@@ -14,12 +13,12 @@ class MessengerWorkflow implements MessengerWorkflowInterface
 {
 
     /**
-     * @param object $command
-     * @return void
-     * @throws ExceptionInterface
+     * @param string $class
+     * @param string|\Stringable $payload
+     * @return \Generator
      */
     #[WorkflowMethod(name: 'run')]
-    public function run(object $command): \Generator
+    public function run(string $class, string|\Stringable $payload): \Generator
     {
         $activity = Workflow::newActivityStub(
             MessengerActivityInterface::class,
@@ -28,6 +27,6 @@ class MessengerWorkflow implements MessengerWorkflowInterface
                 ->withTaskQueue('taskQueue')
         );
 
-        yield $activity->dispatch($command);
+        yield $activity->dispatch($class, $payload);
     }
 }

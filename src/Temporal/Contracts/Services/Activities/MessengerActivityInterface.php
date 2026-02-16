@@ -10,9 +10,10 @@ use Temporal\Activity\ActivityMethod;
 interface MessengerActivityInterface
 {
     /**
-     * @param object $command
-     * @return void
+     * @param string $class
+     * @param object $payload
+     * @return Envelope
      */
     #[ActivityMethod(name: 'dispatch')]
-    public function dispatch(object $command): Envelope;
+    public function dispatch(string $class, string|\Stringable $payload): Envelope;
 }

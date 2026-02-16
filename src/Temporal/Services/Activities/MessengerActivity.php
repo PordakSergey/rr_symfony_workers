@@ -6,27 +6,34 @@ use Rr\Bundle\Workers\Temporal\Contracts\Services\Activities\MessengerActivityIn
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\ExceptionInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Serializer\SerializerInterface;
 use Temporal\Activity\ActivityMethod;
 
 class MessengerActivity implements MessengerActivityInterface
 {
     /**
      * @param MessageBusInterface $messageBus
+     * @param SerializerInterface $serializer
      */
     public function __construct(
-        protected MessageBusInterface $messageBus
+        protected MessageBusInterface $messageBus,
+        protected SerializerInterface $serializer,
     )
     {
     }
 
     /**
-     * @param object $command
-     * @return void
+     * @param string $class
+     * @param object $payload
+     * @return Envelope
      * @throws ExceptionInterface
+     * @throws \Symfony\Component\Serializer\Exception\ExceptionInterface
      */
     #[ActivityMethod(name: 'dispatch')]
-    public function dispatch(object $command): Envelope
+    public function dispatch(string $class, string|\Stringable $payload): Envelope
     {
+        $command = $this->serializer->deserialize($payload, $class, 'json');
+
         return $this->messageBus->dispatch($command);
     }
 }
