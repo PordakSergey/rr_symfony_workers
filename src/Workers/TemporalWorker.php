@@ -16,7 +16,7 @@ final class TemporalWorker implements WorkerInterface
 {
     public function __construct(
         private KernelInterface $kernel,
-        private TemporalStorage $storage,
+        //private TemporalStorage $storage,
     )
     {
     }
@@ -33,12 +33,15 @@ final class TemporalWorker implements WorkerInterface
             \Temporal\Worker\WorkerOptions::new()->withMaxConcurrentActivityExecutionSize(10)
         );
 
-        foreach ($this->storage->getEntity(TemporalEntity::ACTIVITY) as $activity) {
+        $worker->registerActivity(MessengerActivity::class, fn(ReflectionClass $class) => $this->kernel->getContainer()->get($class->getName()));
+        $worker->registerWorkflowTypes(MessengerWorkflow::class);
+
+        /*foreach ($this->storage->getEntity(TemporalEntity::ACTIVITY) as $activity) {
             $worker->registerActivity($activity, fn(ReflectionClass $class) => $this->kernel->getContainer()->get($class->getName()));
         }
         foreach ($this->storage->getEntity(TemporalEntity::WORKFLOW) as $workflow) {
             $worker->registerWorkflowTypes($workflow::class);
-        }
+        }*/
 
         $worker->registerActivityFinalizer(fn() => $this->kernel->shutdown());
         $factory->run();
