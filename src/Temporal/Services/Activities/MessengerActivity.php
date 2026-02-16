@@ -26,7 +26,7 @@ class MessengerActivity implements MessengerActivityInterface
 
     /**
      * @param string $class
-     * @param object $payload
+     * @param array $payload
      * @return Envelope
      * @throws ExceptionInterface
      * @throws \Symfony\Component\Serializer\Exception\ExceptionInterface

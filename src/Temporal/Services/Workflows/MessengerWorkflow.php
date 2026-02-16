@@ -16,7 +16,7 @@ class MessengerWorkflow implements MessengerWorkflowInterface
 
     /**
      * @param string $class
-     * @param string|\Stringable $payload
+     * @param array $payload
      * @return \Generator
      */
     #[WorkflowMethod(name: 'run')]

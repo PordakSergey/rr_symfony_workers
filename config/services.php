@@ -82,11 +82,15 @@ return static function (ContainerConfigurator $container) {
 
     $services->set(TemporalClientInterface::class)->factory([service(TemporalClientFactory::class), 'fromEnvironment']);
 
+    $services->set(\Rr\Bundle\Workers\Temporal\Services\Activities\MessengerActivity::class)->autowire()->public()->tag('temporal.activity');
+    $services->set(\Rr\Bundle\Workers\Temporal\Services\Workflows\MessengerWorkflow::class)->autowire()->public()->tag('temporal.workflow');
+
     $services->set(JobsHandlerInterface::class, service(MessengerJobDispatcherHandler::class));
     $services->set(RrJobDispatcher::class)->autowire()->public()->tag('jobs.dispatcher.rr');
     $services->set(TemporalJobDispatcher::class)->autowire()->public()->tag('jobs.dispatcher.temporal');
-
     $services->set(JobDispatcherInterface::class, service(TemporalJobDispatcher::class));
+
+
 
     $services->alias(WorkerStorageInterface::class, WorkerStorage::class)->public();
     $services->alias(RequestHandlerInterface::class, RequestHandler::class);
