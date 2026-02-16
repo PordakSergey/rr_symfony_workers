@@ -9,5 +9,5 @@ use Temporal\Workflow\WorkflowMethod;
 interface MessengerWorkflowInterface
 {
     #[WorkflowMethod(name: 'run')]
-    public function run(object $command): void;
+    public function run(object $command): \Generator;
 }

@@ -19,14 +19,15 @@ class MessengerWorkflow implements MessengerWorkflowInterface
      * @throws ExceptionInterface
      */
     #[WorkflowMethod(name: 'run')]
-    public function run(object $command): void
+    public function run(object $command): \Generator
     {
         $activity = Workflow::newActivityStub(
             MessengerActivityInterface::class,
             ActivityOptions::new()
                 ->withStartToCloseTimeout(CarbonInterval::second(10))
+                ->withTaskQueue('taskQueue')
         );
 
-        $activity->dispatch($command);
+        yield $activity->dispatch($command);
     }
 }

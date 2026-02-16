@@ -2,6 +2,7 @@
 
 namespace Rr\Bundle\Workers\Temporal\Contracts\Services\Activities;
 
+use Symfony\Component\Messenger\Envelope;
 use Temporal\Activity\ActivityInterface;
 use Temporal\Activity\ActivityMethod;
 
@@ -13,5 +14,5 @@ interface MessengerActivityInterface
      * @return void
      */
     #[ActivityMethod(name: 'dispatch')]
-    public function dispatch(object $command): void;
+    public function dispatch(object $command): Envelope;
 }

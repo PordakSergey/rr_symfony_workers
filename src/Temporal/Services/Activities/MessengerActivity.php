@@ -3,6 +3,7 @@
 namespace Rr\Bundle\Workers\Temporal\Services\Activities;
 
 use Rr\Bundle\Workers\Temporal\Contracts\Services\Activities\MessengerActivityInterface;
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\ExceptionInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Temporal\Activity\ActivityMethod;
@@ -24,8 +25,8 @@ class MessengerActivity implements MessengerActivityInterface
      * @throws ExceptionInterface
      */
     #[ActivityMethod(name: 'dispatch')]
-    public function dispatch(object $command): void
+    public function dispatch(object $command): Envelope
     {
-        $this->messageBus->dispatch($command);
+        return $this->messageBus->dispatch($command);
     }
 }
