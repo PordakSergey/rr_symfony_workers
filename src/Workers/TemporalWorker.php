@@ -2,9 +2,11 @@
 
 namespace Rr\Bundle\Workers\Workers;
 
+use ReflectionClass;
 use Rr\Bundle\Workers\Contracts\Workers\WorkerInterface;
-use Rr\Bundle\Workers\Temporal\Enums\TemporalEntity;
+use Rr\Bundle\Workers\Temporal\Services\Activities\MessengerActivity;
 use Rr\Bundle\Workers\Temporal\Services\Storage\TemporalStorage;
+use Rr\Bundle\Workers\Temporal\Services\Workflows\MessengerWorkflow;
 use Spiral\RoadRunner\Environment;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Temporal\WorkerFactory;
@@ -30,12 +32,15 @@ final class TemporalWorker implements WorkerInterface
             \Temporal\Worker\WorkerOptions::new()->withMaxConcurrentActivityExecutionSize(10)
         );
 
-        foreach ($this->storage->getEntity(TemporalEntity::ACTIVITY) as $activity) {
+        $worker->registerActivity(MessengerActivity::class, fn(ReflectionClass $class) => $this->kernel->getContainer()->get($class->getName()));
+        $worker->registerWorkflowTypes(MessengerWorkflow::class);
+
+        /*foreach ($this->storage->getEntity(TemporalEntity::ACTIVITY) as $activity) {
             $worker->registerActivityImplementations($activity);
         }
         foreach ($this->storage->getEntity(TemporalEntity::WORKFLOW) as $workflow) {
             $worker->registerWorkflowTypes($workflow::class);
-        }
+        }*/
 
         $worker->registerActivityFinalizer(fn() => $this->kernel->shutdown());
         $factory->run();
