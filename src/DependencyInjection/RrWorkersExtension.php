@@ -103,7 +103,7 @@ class RrWorkersExtension extends Extension
         foreach ($dispatchers as $id => $service) {
             $dispatcher = $container->getDefinition($id);
 
-            if(!$dispatcher instanceof JobDispatcherInterface) {
+            if(!class_implements($dispatcher, JobDispatcherInterface::class)) {
                 throw new LogicException("Jobs dispatcher must implement JobsDispatcherInterface.");
             }
 

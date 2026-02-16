@@ -1,16 +1,14 @@
 <?php
 
-namespace Rr\Bundle\Workers\Temporal\Services\JobsDispatcer;
+namespace Rr\Bundle\Workers\Temporal\Services\JobsDispatcher;
 
 use Rr\Bundle\Workers\Contracts\Jobs\JobDispatcherInterface;
 use Rr\Bundle\Workers\Temporal\Contracts\Services\Client\TemporalClientInterface;
 use Rr\Bundle\Workers\Temporal\Services\Workflows\MessengerWorkflow;
-use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Temporal\Client\WorkflowOptions;
 
-#[Autoconfigure(tags: ['jobs.dispatcher.temporal'])]
 class TemporalJobDispatcher implements JobDispatcherInterface
 {
     /**

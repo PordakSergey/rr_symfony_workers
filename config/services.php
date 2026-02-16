@@ -7,10 +7,12 @@ use Rr\Bundle\Workers\Contracts\Workers\WorkerInterface;
 use Rr\Bundle\Workers\Factories\RPCFactory;
 use Rr\Bundle\Workers\Handlers\MessengerJobDispatcherHandler;
 use Rr\Bundle\Workers\Handlers\RequestHandler;
+use Rr\Bundle\Workers\Jobs\Services\JobsDispatcher\RrJobDispatcher;
 use Rr\Bundle\Workers\Middlewares\DoctrineORMMiddleware;
 use Rr\Bundle\Workers\Storage\WorkerStorage;
 use Rr\Bundle\Workers\Temporal\Contracts\Services\Client\TemporalClientInterface;
 use Rr\Bundle\Workers\Temporal\Factories\TemporalClientFactory;
+use Rr\Bundle\Workers\Temporal\Services\JobsDispatcher\TemporalJobDispatcher;
 use Rr\Bundle\Workers\Workers\GrpcWorker;
 use Rr\Bundle\Workers\Workers\HttpWorker;
 use Rr\Bundle\Workers\Workers\JobsWorker;
@@ -78,7 +80,10 @@ return static function (ContainerConfigurator $container) {
     $services->set(TemporalWorker::class)->autowire()->public()->tag('rr.worker');
 
     $services->set(TemporalClientInterface::class)->factory([service(TemporalClientFactory::class), 'fromEnvironment']);
+
     $services->set(JobsHandlerInterface::class, service(MessengerJobDispatcherHandler::class));
+    $services->set(RrJobDispatcher::class)->autowire()->public()->tag('jobs.dispatcher.rr');
+    $services->set(TemporalJobDispatcher::class)->autowire()->public()->tag('jobs.dispatcher.temporal');
 
     $services->alias(WorkerStorageInterface::class, WorkerStorage::class)->public();
     $services->alias(RequestHandlerInterface::class, RequestHandler::class);

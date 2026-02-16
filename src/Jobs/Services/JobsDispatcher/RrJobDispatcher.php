@@ -1,6 +1,6 @@
 <?php
 
-namespace Rr\Bundle\Workers\Jobs\Services\JobsDispatcer;
+namespace Rr\Bundle\Workers\Jobs\Services\JobsDispatcher;
 
 use Psr\Log\LoggerInterface;
 use Rr\Bundle\Workers\Contracts\Jobs\JobDispatcherInterface;
@@ -9,11 +9,9 @@ use Spiral\RoadRunner\Environment;
 use Spiral\RoadRunner\Jobs\Exception\JobsException;
 use Spiral\RoadRunner\Jobs\Jobs;
 use Spiral\RoadRunner\Jobs\Options;
-use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
-#[Autoconfigure(tags: ['jobs.dispatcher.rr'])]
 class RrJobDispatcher implements JobDispatcherInterface
 {
     public function __construct(
