@@ -15,5 +15,5 @@ interface MessengerActivityInterface
      * @return Envelope
      */
     #[ActivityMethod(name: 'dispatch')]
-    public function dispatch(string $class, string|\Stringable $payload): Envelope;
+    public function dispatch(string $class, array $payload): Envelope;
 }

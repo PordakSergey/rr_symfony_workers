@@ -30,7 +30,7 @@ class MessengerActivity implements MessengerActivityInterface
      * @throws \Symfony\Component\Serializer\Exception\ExceptionInterface
      */
     #[ActivityMethod(name: 'dispatch')]
-    public function dispatch(string $class, string|\Stringable $payload): Envelope
+    public function dispatch(string $class, array $payload): Envelope
     {
         $command = $this->serializer->deserialize($payload, $class, 'json');
 

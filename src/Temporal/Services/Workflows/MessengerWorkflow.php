@@ -18,7 +18,7 @@ class MessengerWorkflow implements MessengerWorkflowInterface
      * @return \Generator
      */
     #[WorkflowMethod(name: 'run')]
-    public function run(string $class, string|\Stringable $payload): \Generator
+    public function run(string $class, array $payload): \Generator
     {
         $activity = Workflow::newActivityStub(
             MessengerActivityInterface::class,

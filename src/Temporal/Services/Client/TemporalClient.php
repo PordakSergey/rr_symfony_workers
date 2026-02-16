@@ -52,7 +52,9 @@ class TemporalClient implements TemporalClientInterface
                 ->withWorkflowId('messenger-'.uniqid())
         );
 
-        $handle = $this->temporalClient->start($workflow, $command::class, $this->serializer->serialize($command, 'json'));
+        $payload = json_decode($this->serializer->serialize($command, 'json'), true);
+
+        $handle = $this->temporalClient->start($workflow, $command::class, $payload);
         return $handle->getExecution()->getID();
     }
 }
