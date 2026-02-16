@@ -5,6 +5,7 @@ namespace Rr\Bundle\Workers\DependencyInjection;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Rr\Bundle\Workers\Cache\KvCacheAdapter;
+use Rr\Bundle\Workers\Contracts\Jobs\JobsDispatcherInterface;
 use Rr\Bundle\Workers\Middlewares\DoctrineORMMiddleware;
 use Spiral\Goridge\RPC\RPC;
 use Spiral\Goridge\RPC\RPCInterface;
@@ -37,6 +38,10 @@ class RrWorkersExtension extends Extension
 
         if (!empty($config['kv']['storages'])) {
             $this->configureKv($config, $container);
+        }
+
+        if (!empty($config['jobs']['dispatcher'])) {
+            $this->configureJobs($config, $container);
         }
 
         $container
@@ -72,12 +77,39 @@ class RrWorkersExtension extends Extension
         $storages = $config['kv']['storages'];
 
         foreach ($storages as $storage) {
-            $container->register('cache.adapter.roadrunner.kv_'.$storage, KvCacheAdapter::class)
+            $container->register('cache.adapter.roadrunner.kv_' . $storage, KvCacheAdapter::class)
                 ->setFactory([KvCacheAdapter::class, 'createConnection'])
                 ->setArguments(['', [ // Symfony overrides the first argument with the DSN, so we pass an empty string
                     'rpc' => $container->getDefinition(RPCInterface::class),
                     'storage' => $storage,
                 ]]);
+        }
+    }
+
+    /**
+     * @param array $config
+     * @param ContainerBuilder $container
+     * @return void
+     * @throws \Exception
+     */
+    public function configureJobs(array $config, ContainerBuilder $container): void
+    {
+        $dispatcherConfig = $config['jobs']['dispatcher'];
+        $dispatchers = $container->findTaggedServiceIds($dispatcherConfig);
+        if (empty($dispatchers[array_key_first($dispatchers)])) {
+            throw new LogicException("Jobs dispatcher '$dispatcherConfig' not found.");
+        }
+
+        foreach ($dispatchers as $id => $service) {
+            $dispatcher = $container->getDefinition($id);
+
+            if(!$dispatcher instanceof JobsDispatcherInterface) {
+                throw new LogicException("Jobs dispatcher must implement JobsDispatcherInterface.");
+            }
+
+            $container->register(JobsDispatcherInterface::class, $dispatcher::class);
+
+            break;
         }
     }
 }

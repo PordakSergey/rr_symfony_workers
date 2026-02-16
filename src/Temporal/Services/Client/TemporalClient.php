@@ -23,7 +23,6 @@ class TemporalClient implements TemporalClientInterface
      */
     public function __construct(
         private string $temporalUrl,
-        private SerializerInterface $serializer,
     )
     {
         $serviceClient = ServiceClient::create($this->temporalUrl);
@@ -36,25 +35,5 @@ class TemporalClient implements TemporalClientInterface
     public function getClient(): WorkflowClient
     {
         return $this->temporalClient;
-    }
-
-    /**
-     * @param object $command
-     * @return string
-     * @throws ExceptionInterface
-     */
-    public function dispatch(object $command) : string
-    {
-        $workflow = $this->temporalClient->newWorkflowStub(
-            MessengerWorkflow::class,
-            WorkflowOptions::new()
-                ->withTaskQueue('taskQueue')
-                ->withWorkflowId('messenger-'.uniqid())
-        );
-
-        $payload = json_decode($this->serializer->serialize($command, 'json'), true);
-
-        $handle = $this->temporalClient->start($workflow, $command::class, $payload);
-        return $handle->getExecution()->getID();
     }
 }

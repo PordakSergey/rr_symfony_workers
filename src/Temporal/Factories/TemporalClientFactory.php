@@ -22,10 +22,6 @@ class TemporalClientFactory
             throw BadConfigurationException::missingTemporalUrl();
         }
 
-        $encoders = [new JsonEncoder()];
-        $normalizers = [new ObjectNormalizer()];
-        $serializer = new Serializer($normalizers, $encoders);
-
-        return new TemporalClient($temporalUrl, $serializer);
+        return new TemporalClient($temporalUrl);
     }
 }

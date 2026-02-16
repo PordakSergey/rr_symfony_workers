@@ -31,6 +31,12 @@ class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
+                ->arrayNode("jobs")
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->scalarNode('dispatcher')->defaultValue('jobs.dispatcher.rr')->end()
+                    ->end()
+                ->end()
         ;
 
         return $builder;
