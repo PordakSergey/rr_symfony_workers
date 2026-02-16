@@ -36,13 +36,7 @@ return static function (ContainerConfigurator $container) {
                 DoctrineORMMiddleware::class
             ],
             'after' => [],
-        ])/*->set('interceptors.default', [
-            'before' => [
-               DoctrineORMMiddleware::class
-            ],
-            'after' => [],
-        ])*/
-    ;
+        ]);
 
     $services = $container->services()->defaults()
         ->autowire()
