@@ -79,7 +79,7 @@ class RrWorkersExtension extends Extension
         foreach ($storages as $storage) {
             $container->register('cache.adapter.roadrunner.kv_' . $storage, KvCacheAdapter::class)
                 ->setFactory([KvCacheAdapter::class, 'createConnection'])
-                ->setArguments(['', [ // Symfony overrides the first argument with the DSN, so we pass an empty string
+                ->setArguments(['', [
                     'rpc' => $container->getDefinition(RPCInterface::class),
                     'storage' => $storage,
                 ]]);
@@ -101,10 +101,11 @@ class RrWorkersExtension extends Extension
         }
 
         foreach ($dispatchers as $id => $service) {
-            $dispatcher = $container->getDefinition($id);
+            $dispatcher = $container->findDefinition($id);
+            $class = $dispatcher->getClass();
 
-            if(!class_implements($dispatcher, JobDispatcherInterface::class)) {
-                throw new LogicException("Jobs dispatcher must implement JobsDispatcherInterface.");
+            if (!is_a($class, JobDispatcherInterface::class, true)) {
+                throw new LogicException(\sprintf("Jobs dispatcher should implements '%s'.", JobDispatcherInterface::class));
             }
 
             $container->register(JobDispatcherInterface::class, $dispatcher::class);
