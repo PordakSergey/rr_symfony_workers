@@ -2,11 +2,11 @@
 
 namespace Rr\Bundle\Workers\Contracts\Jobs;
 
-interface JobsDispatcherInterface
+interface JobDispatcherInterface
 {
     /**
      * @param object $command
-     * @return mixed
+     * @return string|null
      */
     public function dispatch(object $command): ?string;
 }

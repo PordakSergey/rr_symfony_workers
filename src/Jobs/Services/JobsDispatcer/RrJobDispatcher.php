@@ -3,7 +3,7 @@
 namespace Rr\Bundle\Workers\Jobs\Services\JobsDispatcer;
 
 use Psr\Log\LoggerInterface;
-use Rr\Bundle\Workers\Contracts\Jobs\JobsDispatcherInterface;
+use Rr\Bundle\Workers\Contracts\Jobs\JobDispatcherInterface;
 use Rr\Bundle\Workers\Factories\RPCFactory;
 use Spiral\RoadRunner\Environment;
 use Spiral\RoadRunner\Jobs\Exception\JobsException;
@@ -14,7 +14,7 @@ use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
 #[Autoconfigure(tags: ['jobs.dispatcher.rr'])]
-class RrJobsDispatcher implements JobsDispatcherInterface
+class RrJobDispatcher implements JobDispatcherInterface
 {
     public function __construct(
         protected RPCFactory          $rpcFactory,

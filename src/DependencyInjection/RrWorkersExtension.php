@@ -5,7 +5,7 @@ namespace Rr\Bundle\Workers\DependencyInjection;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Rr\Bundle\Workers\Cache\KvCacheAdapter;
-use Rr\Bundle\Workers\Contracts\Jobs\JobsDispatcherInterface;
+use Rr\Bundle\Workers\Contracts\Jobs\JobDispatcherInterface;
 use Rr\Bundle\Workers\Middlewares\DoctrineORMMiddleware;
 use Spiral\Goridge\RPC\RPC;
 use Spiral\Goridge\RPC\RPCInterface;
@@ -103,11 +103,11 @@ class RrWorkersExtension extends Extension
         foreach ($dispatchers as $id => $service) {
             $dispatcher = $container->getDefinition($id);
 
-            if(!$dispatcher instanceof JobsDispatcherInterface) {
+            if(!$dispatcher instanceof JobDispatcherInterface) {
                 throw new LogicException("Jobs dispatcher must implement JobsDispatcherInterface.");
             }
 
-            $container->register(JobsDispatcherInterface::class, $dispatcher::class);
+            $container->register(JobDispatcherInterface::class, $dispatcher::class);
 
             break;
         }

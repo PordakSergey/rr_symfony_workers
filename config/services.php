@@ -1,8 +1,11 @@
 <?php
 
+use Rr\Bundle\Workers\Contracts\Handlers\RequestHandlerInterface;
+use Rr\Bundle\Workers\Contracts\Jobs\JobsHandlerInterface;
 use Rr\Bundle\Workers\Contracts\Storage\WorkerStorageInterface;
 use Rr\Bundle\Workers\Contracts\Workers\WorkerInterface;
 use Rr\Bundle\Workers\Factories\RPCFactory;
+use Rr\Bundle\Workers\Handlers\MessengerJobDispatcherHandler;
 use Rr\Bundle\Workers\Handlers\RequestHandler;
 use Rr\Bundle\Workers\Middlewares\DoctrineORMMiddleware;
 use Rr\Bundle\Workers\Storage\WorkerStorage;
@@ -75,7 +78,8 @@ return static function (ContainerConfigurator $container) {
     $services->set(TemporalWorker::class)->autowire()->public()->tag('rr.worker');
 
     $services->set(TemporalClientInterface::class)->factory([service(TemporalClientFactory::class), 'fromEnvironment']);
+    $services->set(JobsHandlerInterface::class, service(MessengerJobDispatcherHandler::class));
 
     $services->alias(WorkerStorageInterface::class, WorkerStorage::class)->public();
-    $services->alias(\Rr\Bundle\Workers\Contracts\Handlers\RequestHandlerInterface::class, RequestHandler::class);
+    $services->alias(RequestHandlerInterface::class, RequestHandler::class);
 };
