@@ -8,6 +8,9 @@ use Temporal\Client\GRPC\ServiceClientInterface;
 
 class TemporalClientServiceFactory
 {
+    /**
+     * @return ServiceClientInterface
+     */
     public static function make() : ServiceClientInterface
     {
         $temporalUrl = $_ENV['TEMPORAL_URL'] ?? $_SERVER['TEMPORAL_URL'] ?? null;
