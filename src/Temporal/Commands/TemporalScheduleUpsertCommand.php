@@ -49,11 +49,9 @@ class TemporalScheduleUpsertCommand extends Command
             $handle = $this->scheduleClient->getHandle($scheduleId);
 
             try {
-                $handle->describe();
-                $handle->update(function ($input) use ($schedule) {
-                    return $schedule;
-                });
+                $handle->update(fn($current) => $schedule);
                 $output->writeln("  <comment>updated</comment>");
+                continue;
             } catch (\Throwable $exception) {
                 $options = ScheduleOptions::new();
                 $this->scheduleClient->createSchedule($schedule, $options, $scheduleId);
