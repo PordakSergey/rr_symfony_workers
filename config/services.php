@@ -11,9 +11,12 @@ use Rr\Bundle\Workers\Handlers\RequestHandler;
 use Rr\Bundle\Workers\Jobs\Services\JobsDispatcher\RrJobDispatcher;
 use Rr\Bundle\Workers\Middlewares\DoctrineORMMiddleware;
 use Rr\Bundle\Workers\Storage\WorkerStorage;
-use Rr\Bundle\Workers\Temporal\Contracts\Services\Client\TemporalClientInterface;
-use Rr\Bundle\Workers\Temporal\Factories\TemporalClientFactory;
+use Rr\Bundle\Workers\Temporal\Factories\TemporalClientScheduleFactory;
+use Rr\Bundle\Workers\Temporal\Factories\TemporalClientServiceFactory;
+use Rr\Bundle\Workers\Temporal\Factories\TemporalClientWorkflowFactory;
+use Rr\Bundle\Workers\Temporal\Services\Activities\MessengerActivity;
 use Rr\Bundle\Workers\Temporal\Services\JobsDispatcher\TemporalJobDispatcher;
+use Rr\Bundle\Workers\Temporal\Services\Workflows\MessengerWorkflow;
 use Rr\Bundle\Workers\Workers\GrpcWorker;
 use Rr\Bundle\Workers\Workers\HttpWorker;
 use Rr\Bundle\Workers\Workers\JobsWorker;
@@ -30,6 +33,9 @@ use Spiral\RoadRunner\Jobs\ConsumerInterface;
 use Spiral\RoadRunner\Worker as RoadRunnerWorker;
 use Spiral\RoadRunner\WorkerInterface as RoadRunnerWorkerInterface;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use Temporal\Client\GRPC\ServiceClientInterface;
+use Temporal\Client\ScheduleClientInterface;
+use Temporal\Client\WorkflowClientInterface;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\tagged_iterator;
 
@@ -80,17 +86,17 @@ return static function (ContainerConfigurator $container) {
     $services->set(GrpcWorker::class)->autowire()->public()->tag('rr.worker');
     $services->set(TemporalWorker::class)->autowire()->public()->tag('rr.worker');
 
-    $services->set(TemporalClientInterface::class)->factory([service(TemporalClientFactory::class), 'fromEnvironment']);
+    $services->set(ServiceClientInterface::class)->factory([service(TemporalClientServiceFactory::class), 'make']);
+    $services->set(WorkflowClientInterface::class)->factory([service(TemporalClientWorkflowFactory::class), 'make']);
+    $services->set(ScheduleClientInterface::class)->factory([service(TemporalClientScheduleFactory::class), 'make']);
 
-    $services->set(\Rr\Bundle\Workers\Temporal\Services\Activities\MessengerActivity::class)->autowire()->public()->tag('temporal.activity');
-    $services->set(\Rr\Bundle\Workers\Temporal\Services\Workflows\MessengerWorkflow::class)->autowire()->public()->tag('temporal.workflow');
+    $services->set(MessengerActivity::class)->autowire()->public()->tag('temporal.activity');
+    $services->set(MessengerWorkflow::class)->autowire()->public()->tag('temporal.workflow');
 
     $services->set(JobsHandlerInterface::class, service(MessengerJobDispatcherHandler::class));
     $services->set(RrJobDispatcher::class)->autowire()->public()->tag('jobs.dispatcher.rr');
     $services->set(TemporalJobDispatcher::class)->autowire()->public()->tag('jobs.dispatcher.temporal');
     $services->set(JobDispatcherInterface::class, service(TemporalJobDispatcher::class));
-
-
 
     $services->alias(WorkerStorageInterface::class, WorkerStorage::class)->public();
     $services->alias(RequestHandlerInterface::class, RequestHandler::class);
