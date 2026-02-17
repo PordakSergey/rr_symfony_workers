@@ -10,6 +10,7 @@ use Temporal\Client\Schedule\Action\StartWorkflowAction;
 use Temporal\Client\Schedule\Schedule;
 use Temporal\Client\Schedule\ScheduleOptions;
 use Temporal\Client\Schedule\Spec\ScheduleSpec;
+use Temporal\Client\Schedule\Update\ScheduleUpdate;
 use Temporal\Client\ScheduleClientInterface;
 
 #[AsCommand(name: "temporal:schedule:upsert", description: "Upsert temporal schedule.")]
@@ -49,11 +50,16 @@ class TemporalScheduleUpsertCommand extends Command
             $handle = $this->scheduleClient->getHandle($scheduleId);
 
             try {
-                $handle->update(fn($current) => $schedule);
+                $handle->update(function ($input) use ($schedule) {
+                    return ScheduleUpdate::new($schedule);
+                });
                 $output->writeln("  <comment>updated</comment>");
                 continue;
             } catch (\Throwable $exception) {
                 $options = ScheduleOptions::new();
+
+                $this->scheduleClient->listSchedules();
+
                 $this->scheduleClient->createSchedule($schedule, $options, $scheduleId);
                 $output->writeln("  <comment>created</comment>");
             }
