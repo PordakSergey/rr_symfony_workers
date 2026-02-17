@@ -4,7 +4,9 @@ namespace Rr\Bundle\Workers\Temporal\Services\Cron;
 
 use Rr\Bundle\Workers\Temporal\Contracts\Services\Cron\CronJobInterface;
 use Rr\Bundle\Workers\Temporal\Services\Workflows\MessengerWorkflow;
+use Symfony\Component\DependencyInjection\Attribute\Exclude;
 
+#[Exclude]
 class CronJob implements CronJobInterface
 {
     public function __construct(

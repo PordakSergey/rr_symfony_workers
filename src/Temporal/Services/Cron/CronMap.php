@@ -6,7 +6,9 @@ use Rr\Bundle\Workers\Temporal\Contracts\Services\Cron\CronMapInterface;
 
 class CronMap implements CronMapInterface
 {
-
+    /**
+     * @return array
+     */
     public function getAll(): array
     {
         return [
