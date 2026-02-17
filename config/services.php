@@ -11,10 +11,12 @@ use Rr\Bundle\Workers\Handlers\RequestHandler;
 use Rr\Bundle\Workers\Jobs\Services\JobsDispatcher\RrJobDispatcher;
 use Rr\Bundle\Workers\Middlewares\DoctrineORMMiddleware;
 use Rr\Bundle\Workers\Storage\WorkerStorage;
+use Rr\Bundle\Workers\Temporal\Contracts\Services\Cron\CronMapInterface;
 use Rr\Bundle\Workers\Temporal\Factories\TemporalClientScheduleFactory;
 use Rr\Bundle\Workers\Temporal\Factories\TemporalClientServiceFactory;
 use Rr\Bundle\Workers\Temporal\Factories\TemporalClientWorkflowFactory;
 use Rr\Bundle\Workers\Temporal\Services\Activities\MessengerActivity;
+use Rr\Bundle\Workers\Temporal\Services\Cron\CronMap;
 use Rr\Bundle\Workers\Temporal\Services\JobsDispatcher\TemporalJobDispatcher;
 use Rr\Bundle\Workers\Temporal\Services\Workflows\MessengerWorkflow;
 use Rr\Bundle\Workers\Workers\GrpcWorker;
@@ -97,6 +99,8 @@ return static function (ContainerConfigurator $container) {
     $services->set(RrJobDispatcher::class)->autowire()->public()->tag('jobs.dispatcher.rr');
     $services->set(TemporalJobDispatcher::class)->autowire()->public()->tag('jobs.dispatcher.temporal');
     $services->set(JobDispatcherInterface::class, service(TemporalJobDispatcher::class));
+
+    $services->set(CronMapInterface::class, CronMap::class);
 
     $services->alias(WorkerStorageInterface::class, WorkerStorage::class)->public();
     $services->alias(RequestHandlerInterface::class, RequestHandler::class);
