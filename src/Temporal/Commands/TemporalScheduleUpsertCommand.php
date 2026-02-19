@@ -20,6 +20,8 @@ use Temporal\Client\ScheduleClientInterface;
 #[AsCommand(name: "temporal:schedule:upsert", description: "Upsert temporal schedule.")]
 class TemporalScheduleUpsertCommand extends Command
 {
+    protected const string TASK_PREFIX = 'cron_job_';
+
     /**
      * @param CronMapInterface $cronMap
      * @param ScheduleClientInterface $scheduleClient
@@ -48,11 +50,16 @@ class TemporalScheduleUpsertCommand extends Command
             return Command::SUCCESS;
         }
 
-        foreach ($this->cronMap->getAll() as $scheduleId => $cronJob) {
+        $wantedIds = [];
+        foreach ($this->cronMap->getAll() as $cronJob) {
+            $taskId = self::TASK_PREFIX . $cronJob->getTaskId();
+
             if (!is_a($cronJob, CronJobInterface::class)) {
                 $output->writeln("  <comment>Command job must be implemented CronJobInterface</comment>");
                 return Command::FAILURE;
             }
+
+            $wantedIds[$taskId] = true;
 
             $args = [$cronJob->getCommand()::class, $this->serializer->serialize($cronJob->getCommand(), "json")];
 
@@ -69,7 +76,7 @@ class TemporalScheduleUpsertCommand extends Command
                 ->withAction($action)
                 ->withSpec($spec);
 
-            $handle = $this->scheduleClient->getHandle($scheduleId);
+            $handle = $this->scheduleClient->getHandle($taskId);
 
             try {
                 $handle->update(function ($input) use ($schedule) {
@@ -82,8 +89,19 @@ class TemporalScheduleUpsertCommand extends Command
 
                 $this->scheduleClient->listSchedules();
 
-                $this->scheduleClient->createSchedule($schedule, $options, $scheduleId);
+                $this->scheduleClient->createSchedule($schedule, $options, $taskId);
                 $output->writeln("  <comment>created</comment>");
+            }
+        }
+
+        foreach ($this->scheduleClient->listSchedules() as $listed) {
+            if (strncmp($listed->scheduleId, self::TASK_PREFIX, strlen(self::TASK_PREFIX)) !== 0) {
+                continue;
+            }
+
+            if (!isset($wantedIds[$listed->scheduleId])) {
+                $this->scheduleClient->getHandle($listed->scheduleId)->delete();
+                $output->writeln("  <comment>deleted</comment> {$listed->scheduleId}");
             }
         }
 
