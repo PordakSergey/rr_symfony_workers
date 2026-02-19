@@ -27,11 +27,11 @@ final class HttpWorker implements WorkerInterface
      * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(
-        private KernelInterface $kernel,
+        private KernelInterface               $kernel,
         private HttpFoundationWorkerInterface $httpFoundationWorker,
-        private MiddlewareStackHandler $requestHandler,
-        private LoggerInterface $logger,
-        private EventDispatcherInterface $eventDispatcher,
+        private MiddlewareStackHandler        $requestHandler,
+        private LoggerInterface               $logger,
+        private EventDispatcherInterface      $eventDispatcher,
     )
     {
         $this->initErrorRenderer($this->kernel);
@@ -60,8 +60,10 @@ final class HttpWorker implements WorkerInterface
                     $this->httpFoundationWorker->respond($response);
                 }
 
-                $this->logger->error('An error occured: '.$e->getMessage(), ['throwable' => $e]);
+                $this->logger->error('An error occured: ' . $e->getMessage(), ['throwable' => $e]);
                 $this->httpFoundationWorker->getWorker()->stop();
+            } finally {
+                $this->kernel->reboot(null);
             }
         }
 
