@@ -56,7 +56,8 @@ class TemporalScheduleUpsertCommand extends Command
 
             $args = [$cronJob->getCommand()::class, $this->serializer->serialize($cronJob->getCommand(), "json")];
 
-            $action = StartWorkflowAction::new($cronJob->getWorkflowType())
+            $action = StartWorkflowAction::new('run')
+                ->withWorkflowType($cronJob->getWorkflowType())
                 ->withTaskQueue($cronJob->getTaskQueue())
                 ->withInput($args);
 
