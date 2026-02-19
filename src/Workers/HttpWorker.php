@@ -63,6 +63,10 @@ final class HttpWorker implements WorkerInterface
                 $this->logger->error('An error occured: ' . $e->getMessage(), ['throwable' => $e]);
                 $this->httpFoundationWorker->getWorker()->stop();
             } finally {
+                if ($this->kernel->getContainer()->has('services_resetter')) {
+                    $resetter = $this->kernel->getContainer()->get('services_resetter');
+                    $resetter->reset();
+                }
                 $this->kernel->reboot(null);
             }
         }
