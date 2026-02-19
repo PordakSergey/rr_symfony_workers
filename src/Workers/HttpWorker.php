@@ -12,6 +12,7 @@ use Rr\Bundle\Workers\Traits\ErrorRenderer;
 use Rr\Bundle\Workers\Traits\GeneratorConsumes;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Spiral\RoadRunner\Environment;
+use Symfony\Component\HttpKernel\TerminableInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 final class HttpWorker implements WorkerInterface
@@ -43,6 +44,7 @@ final class HttpWorker implements WorkerInterface
     public function run(): void
     {
         $this->eventDispatcher->dispatch(new WorkerStartEvent());
+        $resetter = $this->kernel->getContainer()->has('services_resetter') ? $this->kernel->getContainer()->get('services_resetter') : null;
 
         while ($request = $this->httpFoundationWorker->waitRequest()) {
             $send = false;
@@ -51,7 +53,10 @@ final class HttpWorker implements WorkerInterface
                 $response = $gen->current();
 
                 $this->httpFoundationWorker->respond($response);
-                $this->kernel->terminate($request, $response);
+
+                if ($this->kernel instanceof TerminableInterface) {
+                    $this->kernel->terminate($request, $response);
+                }
 
                 $send = true;
                 $this->consumes($gen);
@@ -64,7 +69,6 @@ final class HttpWorker implements WorkerInterface
                 $this->logger->error('An error occured: ' . $e->getMessage(), ['throwable' => $e]);
                 $this->httpFoundationWorker->getWorker()->stop();
             } finally {
-                $resetter = $this->kernel->getContainer()->get('services_resetter');
                 $resetter->reset();
             }
         }
