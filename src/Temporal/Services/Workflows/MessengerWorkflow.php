@@ -7,6 +7,7 @@ use Rr\Bundle\Workers\Temporal\Contracts\Services\Activities\MessengerActivityIn
 use Rr\Bundle\Workers\Temporal\Contracts\Services\Workflows\MessengerWorkflowInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Temporal\Activity\ActivityOptions;
+use Temporal\Common\RetryOptions;
 use Temporal\Workflow;
 use Temporal\Workflow\WorkflowMethod;
 
@@ -27,6 +28,7 @@ class MessengerWorkflow implements MessengerWorkflowInterface
             ActivityOptions::new()
                 ->withStartToCloseTimeout(CarbonInterval::minutes(2))
                 ->withTaskQueue('taskQueue')
+                ->withRetryOptions(RetryOptions::new()->withMaximumAttempts(1))
         );
 
         yield $activity->dispatch($class, $payload);
