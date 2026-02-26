@@ -43,7 +43,12 @@ final class TemporalWorker implements WorkerInterface
             $worker->registerWorkflowTypes($workflow::class);
         }*/
 
-        $worker->registerActivityFinalizer(fn() => $this->kernel->shutdown());
+        $worker->registerActivityFinalizer(function (): void {
+            $container = $this->kernel->getContainer();
+            if ($container->has('services_resetter')) {
+                $container->get('services_resetter')->reset();
+            }
+        });
         $factory->run();
     }
 
