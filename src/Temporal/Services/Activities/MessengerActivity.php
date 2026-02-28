@@ -7,7 +7,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\ExceptionInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
-use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Temporal\Activity\ActivityMethod;
 
 #[Autoconfigure(tags: ['temporal.activity'])]
@@ -15,11 +15,11 @@ class MessengerActivity implements MessengerActivityInterface
 {
     /**
      * @param MessageBusInterface $messageBus
-     * @param SerializerInterface $serializer
+     * @param DenormalizerInterface $serializer
      */
     public function __construct(
         protected MessageBusInterface $messageBus,
-        protected SerializerInterface $serializer,
+        protected DenormalizerInterface $serializer,
     )
     {
     }
@@ -34,7 +34,7 @@ class MessengerActivity implements MessengerActivityInterface
     #[ActivityMethod(name: 'dispatch')]
     public function dispatch(string $class, array $payload): Envelope
     {
-        $command = $this->serializer->deserialize(json_encode($payload), $class, 'json');
+        $command = $this->serializer->denormalize($payload, $class, 'json');
 
         return $this->messageBus->dispatch($command);
     }

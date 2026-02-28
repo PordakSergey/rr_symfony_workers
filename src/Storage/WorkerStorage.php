@@ -7,7 +7,7 @@ use Rr\Bundle\Workers\Contracts\Workers\WorkerInterface;
 
 final class WorkerStorage implements WorkerStorageInterface
 {
-    /** @var iterable<WorkerInterface> */
+    /** @var iterable<WorkerInterface> $workers */
     public function __construct(private iterable $workers) {}
 
     /**

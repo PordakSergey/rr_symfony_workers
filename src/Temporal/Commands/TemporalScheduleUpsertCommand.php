@@ -9,7 +9,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
-use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Temporal\Client\Schedule\Action\StartWorkflowAction;
 use Temporal\Client\Schedule\Schedule;
 use Temporal\Client\Schedule\ScheduleOptions;
@@ -18,19 +18,19 @@ use Temporal\Client\Schedule\Update\ScheduleUpdate;
 use Temporal\Client\ScheduleClientInterface;
 
 #[AsCommand(name: "temporal:schedule:upsert", description: "Upsert temporal schedule.")]
-class TemporalScheduleUpsertCommand extends Command
+final class TemporalScheduleUpsertCommand extends Command
 {
     protected const string TASK_PREFIX = 'cron_job_';
 
     /**
      * @param CronMapInterface $cronMap
      * @param ScheduleClientInterface $scheduleClient
-     * @param SerializerInterface $serializer
+     * @param NormalizerInterface $serializer
      */
     public function __construct(
         protected CronMapInterface        $cronMap,
         protected ScheduleClientInterface $scheduleClient,
-        protected SerializerInterface     $serializer,
+        protected NormalizerInterface     $serializer,
 
     )
     {
@@ -63,7 +63,7 @@ class TemporalScheduleUpsertCommand extends Command
 
             $args = [
                 $cronJob->getCommand()::class,
-                json_decode($this->serializer->serialize($cronJob->getCommand(), 'json'), true)
+                $this->serializer->normalize($cronJob->getCommand(), 'json'),
             ];
 
             $action = StartWorkflowAction::new('run')
