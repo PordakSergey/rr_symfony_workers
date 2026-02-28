@@ -18,7 +18,7 @@ class MessengerJobDispatcherHandler implements JobsHandlerInterface
 
     /**
      * @param object $command
-     * @return string
+     * @return string|null
      */
     public function dispatch(object $command): ?string
     {

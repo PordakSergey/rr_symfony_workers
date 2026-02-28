@@ -30,16 +30,16 @@ final class TemporalWorker implements WorkerInterface
 
         $worker = $factory->newWorker(
             'taskQueue',
-            \Temporal\Worker\WorkerOptions::new()->withMaxConcurrentActivityExecutionSize(10)
+            \Temporal\Worker\WorkerOptions::new()
+                ->withMaxConcurrentActivityExecutionSize(10)
+                ->withMaxConcurrentWorkflowTaskExecutionSize(10)
         );
 
         $worker->registerActivity(MessengerActivity::class, fn(ReflectionClass $class) => $this->kernel->getContainer()->get($class->getName()));
         $worker->registerWorkflowTypes(MessengerWorkflow::class);
 
-        /*foreach ($this->storage->getEntity(TemporalEntity::ACTIVITY) as $activity) {
-            $worker->registerActivity($activity, fn(ReflectionClass $class) => $this->kernel->getContainer()->get($class->getName()));
-        }
-        foreach ($this->storage->getEntity(TemporalEntity::WORKFLOW) as $workflow) {
+        /*
+        foreach ($this->storage->getEntity(TemporalEntity::WORKFLOW2) as $workflow) {
             $worker->registerWorkflowTypes($workflow::class);
         }*/
 
