@@ -56,7 +56,7 @@ final class ServerParser
         $server['REQUEST_TIME'] = time();
         $server['REQUEST_TIME_FLOAT'] = microtime(true);
         $server['REMOTE_ADDR'] = $_ENV['APP_ENV'] == 'prod' ?
-            $request->headers['X-Real-IP'][0] ?? $request->getRemoteAddr() : $request->getRemoteAddr();
+            $request->headers['X-Real-Ip'][0] ?? $request->getRemoteAddr() : $request->getRemoteAddr();
         $server['REQUEST_METHOD'] = $request->method;
         $server['SERVER_PROTOCOL'] = $request->protocol;
 
