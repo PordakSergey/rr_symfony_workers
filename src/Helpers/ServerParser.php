@@ -55,7 +55,8 @@ final class ServerParser
 
         $server['REQUEST_TIME'] = time();
         $server['REQUEST_TIME_FLOAT'] = microtime(true);
-        $server['REMOTE_ADDR'] = $request->getRemoteAddr();
+        $server['REMOTE_ADDR'] = $_ENV['APP_ENV'] == 'prod' ?
+            $request->headers['X-Real-IP'] ?? $request->getRemoteAddr() : $request->getRemoteAddr();
         $server['REQUEST_METHOD'] = $request->method;
         $server['SERVER_PROTOCOL'] = $request->protocol;
 
@@ -112,7 +113,7 @@ final class ServerParser
     public function stringifyHeaders(array $headers): array
     {
         return array_map(static function ($headerValues) {
-            return array_map(static fn ($val) => (string) $val, (array) $headerValues);
+            return array_map(static fn($val) => (string)$val, (array)$headerValues);
         }, $headers);
     }
 }
