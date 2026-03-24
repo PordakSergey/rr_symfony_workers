@@ -14,9 +14,16 @@ use Temporal\WorkerFactory;
 
 final class TemporalWorker implements WorkerInterface
 {
+    protected const int MAX_CONCURRENT_ACTIVITIES = 10;
+    protected const int MAX_CONCURRENT_WORKFLOWS = 10;
+
+    /**
+     * @param KernelInterface $kernel
+     * @param TemporalStorage $storage
+     */
     public function __construct(
-        private KernelInterface $kernel,
-        //private TemporalStorage $storage,
+        protected KernelInterface $kernel,
+        protected TemporalStorage $storage,
     )
     {
     }
@@ -31,17 +38,16 @@ final class TemporalWorker implements WorkerInterface
         $worker = $factory->newWorker(
             'taskQueue',
             \Temporal\Worker\WorkerOptions::new()
-                ->withMaxConcurrentActivityExecutionSize(10)
-                ->withMaxConcurrentWorkflowTaskExecutionSize(10)
+                ->withMaxConcurrentActivityExecutionSize(self::MAX_CONCURRENT_ACTIVITIES)
+                ->withMaxConcurrentWorkflowTaskExecutionSize(self::MAX_CONCURRENT_WORKFLOWS)
         );
 
-        $worker->registerActivity(MessengerActivity::class, fn(ReflectionClass $class) => $this->kernel->getContainer()->get($class->getName()));
-        $worker->registerWorkflowTypes(MessengerWorkflow::class);
-
-        /*
-        foreach ($this->storage->getEntity(TemporalEntity::WORKFLOW2) as $workflow) {
+        foreach ( $this->storage->getActivities() as $activity) {
+            $worker->registerActivity($activity::class, fn(ReflectionClass $class) => $this->kernel->getContainer()->get($class->getName()));
+        }
+        foreach ($this->storage->getWorkflows() as $workflow) {
             $worker->registerWorkflowTypes($workflow::class);
-        }*/
+        }
 
         $worker->registerActivityFinalizer(function (): void {
             $container = $this->kernel->getContainer();

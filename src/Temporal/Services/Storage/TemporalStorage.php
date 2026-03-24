@@ -4,29 +4,43 @@ namespace Rr\Bundle\Workers\Temporal\Services\Storage;
 
 use Rr\Bundle\Workers\Temporal\Enums\TemporalEntity;
 
-class TemporalStorage
+final class TemporalStorage
 {
     /**
-     * @var array
+     * @param iterable $activities
+     * @param iterable $workflows
      */
-    public array $storage = [];
+    public function __construct(
+        protected iterable $activities,
+        protected iterable $workflows
+    )
+    {}
 
     /**
      * @param object $entityClass
      * @param TemporalEntity $entityType
      * @return void
      */
-    public function setEntityStorage(object $entityClass, TemporalEntity $entityType): void
+    public function getActivities(): array
     {
-        $this->storage[$entityType->value][$entityClass::class] = $entityClass;
+        $activities = [];
+        foreach ($this->activities as $activity) {
+            $activities[] = $activity;
+        }
+        return $activities;
     }
 
     /**
      * @param TemporalEntity $entityType
      * @return array
      */
-    public function getEntity(TemporalEntity $entityType) : array
+    public function getWorkflows(): array
     {
-        return $this->storage[$entityType->value] ?? [];
+        $workflows = [];
+        foreach ($this->workflows as $workflow) {
+            $workflows[] = $workflow;
+        }
+
+        return $workflows;
     }
 }

@@ -18,6 +18,7 @@ use Rr\Bundle\Workers\Temporal\Factories\TemporalClientWorkflowFactory;
 use Rr\Bundle\Workers\Temporal\Services\Activities\MessengerActivity;
 use Rr\Bundle\Workers\Temporal\Services\Cron\CronMap;
 use Rr\Bundle\Workers\Temporal\Services\JobsDispatcher\TemporalJobDispatcher;
+use Rr\Bundle\Workers\Temporal\Services\Storage\TemporalStorage;
 use Rr\Bundle\Workers\Temporal\Services\Workflows\MessengerWorkflow;
 use Rr\Bundle\Workers\Workers\GrpcWorker;
 use Rr\Bundle\Workers\Workers\HttpWorker;
@@ -81,25 +82,32 @@ return static function (ContainerConfigurator $container) {
         ->load('Rr\\Bundle\\Workers\\', realpath(__DIR__ . '/../src') . '/')
         ->public();
 
-    // Bundle
+    // Workers
     $services->instanceof(WorkerInterface::class)->tag('rr.worker');
     $services->set(JobsWorker::class)->autowire()->public()->tag('rr.worker');
     $services->set(HttpWorker::class)->autowire()->public()->tag('rr.worker');
     $services->set(GrpcWorker::class)->autowire()->public()->tag('rr.worker');
     $services->set(TemporalWorker::class)->autowire()->public()->tag('rr.worker');
 
+    // Factories
     $services->set(ServiceClientInterface::class)->factory([service(TemporalClientServiceFactory::class), 'make']);
     $services->set(WorkflowClientInterface::class)->factory([service(TemporalClientWorkflowFactory::class), 'make']);
     $services->set(ScheduleClientInterface::class)->factory([service(TemporalClientScheduleFactory::class), 'make']);
 
+    // Activities & Workflows
+    $services->set(TemporalStorage::class)->autowire()->public()
+        ->bind('iterable $activities', tagged_iterator('temporal.activity'))
+        ->bind('iterable $workflows', tagged_iterator('temporal.workflow'));
     $services->set(MessengerActivity::class)->autowire()->public()->tag('temporal.activity');
     $services->set(MessengerWorkflow::class)->autowire()->public()->tag('temporal.workflow');
 
+    // Jobs
     $services->set(JobsHandlerInterface::class, service(MessengerJobDispatcherHandler::class));
     $services->set(RrJobDispatcher::class)->autowire()->public()->tag('jobs.dispatcher.rr');
     $services->set(TemporalJobDispatcher::class)->autowire()->public()->tag('jobs.dispatcher.temporal');
     $services->set(JobDispatcherInterface::class, service(TemporalJobDispatcher::class));
 
+    // Cron
     $services->set(CronMapInterface::class, CronMap::class);
 
     $services->alias(WorkerStorageInterface::class, WorkerStorage::class)->public();
