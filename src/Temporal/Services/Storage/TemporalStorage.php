@@ -2,8 +2,6 @@
 
 namespace Rr\Bundle\Workers\Temporal\Services\Storage;
 
-use Rr\Bundle\Workers\Temporal\Enums\TemporalEntity;
-
 final class TemporalStorage
 {
     /**
@@ -17,9 +15,7 @@ final class TemporalStorage
     {}
 
     /**
-     * @param object $entityClass
-     * @param TemporalEntity $entityType
-     * @return void
+     * @return array
      */
     public function getActivities(): array
     {
@@ -31,7 +27,6 @@ final class TemporalStorage
     }
 
     /**
-     * @param TemporalEntity $entityType
      * @return array
      */
     public function getWorkflows(): array
