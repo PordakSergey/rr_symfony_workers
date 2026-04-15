@@ -26,7 +26,7 @@ class MessengerWorkflow implements MessengerWorkflowInterface
         $activity = Workflow::newActivityStub(
             MessengerActivityInterface::class,
             ActivityOptions::new()
-                ->withStartToCloseTimeout(CarbonInterval::minutes(2))
+                ->withStartToCloseTimeout(CarbonInterval::minutes(3))
                 ->withTaskQueue('taskQueue')
                 ->withRetryOptions(RetryOptions::new()->withMaximumAttempts(1))
         );
