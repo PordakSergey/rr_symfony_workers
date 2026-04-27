@@ -1,16 +1,19 @@
 <?php
 
-namespace Rr\Bundle\Workers\Jobs\Responce;
+namespace Rr\Bundle\Workers\Jobs\Response;
 
-class JobResponse
+use Symfony\Component\DependencyInjection\Attribute\Exclude;
+
+#[Exclude]
+readonly class JobResponse
 {
     /**
      * @param string $id
      * @param mixed $result
      */
     public function __construct(
-        protected readonly string $id,
-        protected readonly mixed  $result,
+        protected string $id,
+        protected mixed  $result,
     )
     {
     }

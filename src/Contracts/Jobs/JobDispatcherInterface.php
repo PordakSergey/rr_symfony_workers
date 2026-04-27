@@ -2,7 +2,7 @@
 
 namespace Rr\Bundle\Workers\Contracts\Jobs;
 
-use Rr\Bundle\Workers\Jobs\Responce\JobResponse;
+use Rr\Bundle\Workers\Jobs\Response\JobResponse;
 
 interface JobDispatcherInterface
 {

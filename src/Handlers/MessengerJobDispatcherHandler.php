@@ -4,7 +4,7 @@ namespace Rr\Bundle\Workers\Handlers;
 
 use Rr\Bundle\Workers\Contracts\Jobs\JobDispatcherInterface;
 use Rr\Bundle\Workers\Contracts\Jobs\JobsHandlerInterface;
-use Rr\Bundle\Workers\Jobs\Responce\JobResponse;
+use Rr\Bundle\Workers\Jobs\Response\JobResponse;
 
 class MessengerJobDispatcherHandler implements JobsHandlerInterface
 {
