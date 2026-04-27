@@ -4,23 +4,26 @@ namespace Rr\Bundle\Workers\Temporal\Services\Workflows;
 
 use Carbon\CarbonInterval;
 use Rr\Bundle\Workers\Temporal\Contracts\Services\Activities\MessengerActivityInterface;
+use Rr\Bundle\Workers\Temporal\Contracts\Services\Activities\MessengerPoolActivityInterface;
+use Rr\Bundle\Workers\Temporal\Contracts\Services\Workflows\MessengerPoolWorkflowInterface;
 use Rr\Bundle\Workers\Temporal\Contracts\Services\Workflows\MessengerWorkflowInterface;
+use Rr\Bundle\Workers\Temporal\Services\Activities\MessengerPoolActivity;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Temporal\Activity\ActivityOptions;
 use Temporal\Common\RetryOptions;
+use Temporal\Promise;
 use Temporal\Workflow;
 use Temporal\Workflow\WorkflowMethod;
 
-class MessengerWorkflow implements MessengerWorkflowInterface
+class MessengerPoolWorkflow implements MessengerPoolWorkflowInterface
 {
 
     /**
-     * @param string $class
-     * @param array $payload
+     * @param array $commands
      * @return \Generator
      */
     #[WorkflowMethod(name: 'run')]
-    public function run(string $class, array $payload): \Generator
+    public function run(array $commands): \Generator
     {
         $activity = Workflow::newActivityStub(
             MessengerActivityInterface::class,
@@ -30,6 +33,12 @@ class MessengerWorkflow implements MessengerWorkflowInterface
                 ->withRetryOptions(RetryOptions::new()->withMaximumAttempts(1))
         );
 
-        yield $activity->dispatch($class, $payload);
+        $promises = array_map(function ($command) use ($activity) {
+            return $activity->compose($command['class'], $command['payload']);
+        }, $commands);
+
+        $results = yield Promise::all($promises);
+
+        return yield $results;
     }
 }

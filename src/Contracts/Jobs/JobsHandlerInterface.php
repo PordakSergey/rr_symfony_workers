@@ -2,11 +2,21 @@
 
 namespace Rr\Bundle\Workers\Contracts\Jobs;
 
+use Rr\Bundle\Workers\Jobs\Responce\JobResponse;
+
 interface JobsHandlerInterface
 {
     /**
      * @param object $command
-     * @return string|null
+     * @param bool $returnResult
+     * @return JobResponse
      */
-    public function dispatch(object $command): ?string;
+    public function dispatch(object $command, bool $returnResult = false): JobResponse;
+
+    /**
+     * @param array $commands
+     * @param bool $returnResult
+     * @return JobResponse[]
+     */
+    public function dispatchPool(array $commands, bool $returnResult = false): array;
 }

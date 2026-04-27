@@ -7,13 +7,12 @@ use Temporal\Activity\ActivityInterface;
 use Temporal\Activity\ActivityMethod;
 
 #[ActivityInterface]
-interface MessengerActivityInterface
+interface MessengerPoolActivityInterface
 {
     /**
-     * @param string $class
-     * @param array $payload
+     * @param object[] $commands
      * @return Envelope
      */
-    #[ActivityMethod(name: 'dispatch')]
-    public function dispatch(string $class, array $payload): Envelope;
+    #[ActivityMethod(name: 'dispatchPool')]
+    public function dispatchPool(array $commands): Envelope;
 }

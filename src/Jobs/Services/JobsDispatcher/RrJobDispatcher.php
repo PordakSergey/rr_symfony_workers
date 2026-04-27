@@ -5,10 +5,12 @@ namespace Rr\Bundle\Workers\Jobs\Services\JobsDispatcher;
 use Psr\Log\LoggerInterface;
 use Rr\Bundle\Workers\Contracts\Jobs\JobDispatcherInterface;
 use Rr\Bundle\Workers\Factories\RPCFactory;
+use Rr\Bundle\Workers\Jobs\Responce\JobResponse;
 use Spiral\RoadRunner\Environment;
 use Spiral\RoadRunner\Jobs\Exception\JobsException;
 use Spiral\RoadRunner\Jobs\Jobs;
 use Spiral\RoadRunner\Jobs\Options;
+use Spiral\RoadRunner\KeyValue\Exception\NotImplementedException;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -25,11 +27,10 @@ class RrJobDispatcher implements JobDispatcherInterface
 
     /**
      * @param object $command
-     * @return string
-     * @throws JobsException
-     * @throws ExceptionInterface
+     * @param bool $returnResult
+     * @return JobResponse
      */
-    public function dispatch(object $command): ?string
+    public function dispatch(object $command, bool $returnResult = false): JobResponse
     {
         try {
             $jobs = new Jobs($this->rpcFactory::fromEnvironment(Environment::fromGlobals()));
@@ -37,11 +38,21 @@ class RrJobDispatcher implements JobDispatcherInterface
             $task = $queue->create($command::class, $this->serializer->serialize($command, 'json'), new Options());
             $sendTask = $queue->dispatch($task);
 
-            return $sendTask->getId();
+            return new JobResponse( $sendTask->getId(), null);
         } catch (JobsException|ExceptionInterface $e) {
             $this->logger->error('Error job: ' . $command::class . ' error: ' . $e->getMessage());
+            return new JobResponse('', null);
         }
+    }
 
-        return null;
+    /**
+     * @param array $commands
+     * @param bool $returnResult
+     * @return array|JobResponse[]
+     * @throws NotImplementedException
+     */
+    public function dispatchPool(array $commands, bool $returnResult = false): array
+    {
+        throw new NotImplementedException('Not implemented');
     }
 }

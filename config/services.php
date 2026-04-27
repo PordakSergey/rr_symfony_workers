@@ -16,9 +16,11 @@ use Rr\Bundle\Workers\Temporal\Factories\TemporalClientScheduleFactory;
 use Rr\Bundle\Workers\Temporal\Factories\TemporalClientServiceFactory;
 use Rr\Bundle\Workers\Temporal\Factories\TemporalClientWorkflowFactory;
 use Rr\Bundle\Workers\Temporal\Services\Activities\MessengerActivity;
+use Rr\Bundle\Workers\Temporal\Services\Activities\MessengerPoolActivity;
 use Rr\Bundle\Workers\Temporal\Services\Cron\CronMap;
 use Rr\Bundle\Workers\Temporal\Services\JobsDispatcher\TemporalJobDispatcher;
 use Rr\Bundle\Workers\Temporal\Services\Storage\TemporalStorage;
+use Rr\Bundle\Workers\Temporal\Services\Workflows\MessengerPoolWorkflow;
 use Rr\Bundle\Workers\Temporal\Services\Workflows\MessengerWorkflow;
 use Rr\Bundle\Workers\Workers\GrpcWorker;
 use Rr\Bundle\Workers\Workers\HttpWorker;
@@ -100,6 +102,7 @@ return static function (ContainerConfigurator $container) {
         ->bind('iterable $workflows', tagged_iterator('temporal.workflow'));
     $services->set(MessengerActivity::class)->autowire()->public()->tag('temporal.activity');
     $services->set(MessengerWorkflow::class)->autowire()->public()->tag('temporal.workflow');
+    $services->set(MessengerPoolWorkflow::class)->autowire()->public()->tag('temporal.workflow');
 
     // Jobs
     $services->set(JobsHandlerInterface::class, service(MessengerJobDispatcherHandler::class));

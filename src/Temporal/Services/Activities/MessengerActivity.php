@@ -10,7 +10,6 @@ use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Temporal\Activity\ActivityMethod;
 
-#[Autoconfigure(tags: ['temporal.activity'])]
 class MessengerActivity implements MessengerActivityInterface
 {
     /**
