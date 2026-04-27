@@ -5,7 +5,6 @@ namespace Rr\Bundle\Workers\Temporal\Services\Workflows;
 use Carbon\CarbonInterval;
 use Rr\Bundle\Workers\Temporal\Contracts\Services\Activities\MessengerActivityInterface;
 use Rr\Bundle\Workers\Temporal\Contracts\Services\Workflows\MessengerWorkflowInterface;
-use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Temporal\Activity\ActivityOptions;
 use Temporal\Common\RetryOptions;
 use Temporal\Workflow;

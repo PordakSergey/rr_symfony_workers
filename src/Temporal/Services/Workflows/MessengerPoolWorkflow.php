@@ -4,11 +4,7 @@ namespace Rr\Bundle\Workers\Temporal\Services\Workflows;
 
 use Carbon\CarbonInterval;
 use Rr\Bundle\Workers\Temporal\Contracts\Services\Activities\MessengerActivityInterface;
-use Rr\Bundle\Workers\Temporal\Contracts\Services\Activities\MessengerPoolActivityInterface;
 use Rr\Bundle\Workers\Temporal\Contracts\Services\Workflows\MessengerPoolWorkflowInterface;
-use Rr\Bundle\Workers\Temporal\Contracts\Services\Workflows\MessengerWorkflowInterface;
-use Rr\Bundle\Workers\Temporal\Services\Activities\MessengerPoolActivity;
-use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Temporal\Activity\ActivityOptions;
 use Temporal\Common\RetryOptions;
 use Temporal\Promise;
@@ -22,7 +18,7 @@ class MessengerPoolWorkflow implements MessengerPoolWorkflowInterface
      * @param array $commands
      * @return \Generator
      */
-    #[WorkflowMethod(name: 'run')]
+    #[WorkflowMethod(name: 'runPool')]
     public function run(array $commands): \Generator
     {
         $activity = Workflow::newActivityStub(

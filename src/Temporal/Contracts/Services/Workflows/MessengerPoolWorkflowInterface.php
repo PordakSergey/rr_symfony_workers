@@ -12,6 +12,6 @@ interface MessengerPoolWorkflowInterface
      * @param object[] $commands
      * @return \Generator
      */
-    #[WorkflowMethod(name: 'run')]
+    #[WorkflowMethod(name: 'runPool')]
     public function run(array $commands): \Generator;
 }
