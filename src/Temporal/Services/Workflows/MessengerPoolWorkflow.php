@@ -30,7 +30,7 @@ class MessengerPoolWorkflow implements MessengerPoolWorkflowInterface
         );
 
         $promises = array_map(function ($command) use ($activity) {
-            return $activity->compose($command['class'], $command['payload']);
+            return $activity->dispatch($command['class'], $command['payload']);
         }, $commands);
 
         $results = yield Promise::all($promises);
