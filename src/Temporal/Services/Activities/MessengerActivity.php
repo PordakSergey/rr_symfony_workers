@@ -33,7 +33,7 @@ class MessengerActivity implements MessengerActivityInterface
      * @throws \Symfony\Component\Serializer\Exception\ExceptionInterface
      */
     #[ActivityMethod(name: 'dispatch')]
-    public function dispatch(string $class, array $payload): mixed
+    public function dispatch(string $class, array $payload): array
     {
         $command = $this->serializer->denormalize($payload, $class, 'json');
 
