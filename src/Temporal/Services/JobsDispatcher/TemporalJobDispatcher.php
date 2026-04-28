@@ -66,7 +66,10 @@ class TemporalJobDispatcher implements JobDispatcherInterface
 
         $request = [];
         foreach ($commands as $command) {
-            $request[] = ['class' => $command::class, 'payload' => $this->serializer->normalize($command, 'json')];
+            $request[] = [
+                'class' => $command::class,
+                'payload' => $this->serializer->normalize($command, 'json')
+            ];
         }
 
         $handle = $this->client->start($workflow, $request);
@@ -74,10 +77,30 @@ class TemporalJobDispatcher implements JobDispatcherInterface
         if ($returnResult) {
             $results = [];
             foreach ($handle->getResult() as $result) {
-                $results[] = new JobResponse($handle->getExecution()->getID(), $result);
+                $results[] = new JobResponse(
+                    $handle->getExecution()->getID(),
+                    $this->deepToArray($result)
+                );
             }
         }
 
         return $results ?? [];
+    }
+
+    /**
+     * @param mixed $value
+     * @return mixed
+     */
+    private function deepToArray(mixed $value): mixed
+    {
+        if ($value instanceof \stdClass) {
+            $value = get_object_vars($value);
+        }
+
+        if (is_array($value)) {
+            return array_map(fn(mixed $item) => $this->deepToArray($item), $value);
+        }
+
+        return $value;
     }
 }

@@ -39,21 +39,6 @@ class MessengerActivity implements MessengerActivityInterface
     {
         $command = $this->denormalizer->denormalize($payload, $class, 'json');
 
-        return $this->normalizeResult($this->handle($command));
-    }
-
-    /**
-     * @param mixed $result
-     * @return array
-     * @throws \JsonException
-     * @throws \Symfony\Component\Serializer\Exception\ExceptionInterface
-     */
-    private function normalizeResult(mixed $result): array
-    {
-        if (is_array($result)) {
-            return json_decode(json_encode($result, JSON_THROW_ON_ERROR), true, 512, JSON_THROW_ON_ERROR);
-        }
-
-        return $this->normalizer->normalize($result, 'json');
+        return $this->handle($command);
     }
 }
