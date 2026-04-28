@@ -12,8 +12,8 @@ interface MessengerActivityInterface
     /**
      * @param string $class
      * @param array $payload
-     * @return Envelope
+     * @return mixed
      */
     #[ActivityMethod(name: 'dispatch')]
-    public function dispatch(string $class, array $payload): Envelope;
+    public function dispatch(string $class, array $payload): mixed;
 }
