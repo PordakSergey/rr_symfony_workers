@@ -33,8 +33,6 @@ class MessengerPoolWorkflow implements MessengerPoolWorkflowInterface
             return $activity->dispatch($command['class'], $command['payload']);
         }, $commands);
 
-        $results = yield Promise::all($promises);
-
-        return yield $results;
+        return yield Promise::all($promises);
     }
 }
