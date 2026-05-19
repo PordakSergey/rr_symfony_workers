@@ -26,7 +26,10 @@ class MessengerWorkflow implements MessengerWorkflowInterface
             ActivityOptions::new()
                 ->withStartToCloseTimeout(CarbonInterval::minutes(3))
                 ->withTaskQueue('taskQueue')
-                ->withRetryOptions(RetryOptions::new()->withMaximumAttempts(1))
+                ->withRetryOptions(RetryOptions::new()
+                    ->withMaximumAttempts(2)
+                    ->withInitialInterval(CarbonInterval::second(3))
+                )
         );
 
         yield $activity->dispatch($class, $payload);
