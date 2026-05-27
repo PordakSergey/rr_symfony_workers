@@ -5,6 +5,7 @@ namespace Rr\Bundle\Workers\Temporal\Services\Activities;
 use Rr\Bundle\Workers\Temporal\Contracts\Services\Activities\MessengerActivityInterface;
 use Symfony\Component\Messenger\HandleTrait;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Temporal\Activity\ActivityMethod;
@@ -30,12 +31,11 @@ class MessengerActivity implements MessengerActivityInterface
     /**
      * @param string $class
      * @param array $payload
-     * @return array
-     * @throws \JsonException
-     * @throws \Symfony\Component\Serializer\Exception\ExceptionInterface
+     * @return mixed
+     * @throws ExceptionInterface
      */
     #[ActivityMethod(name: 'dispatch')]
-    public function dispatch(string $class, array $payload): array
+    public function dispatch(string $class, array $payload): mixed
     {
         $command = $this->denormalizer->denormalize($payload, $class, 'json');
 

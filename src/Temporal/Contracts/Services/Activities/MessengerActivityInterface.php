@@ -15,5 +15,5 @@ interface MessengerActivityInterface
      * @return mixed
      */
     #[ActivityMethod(name: 'dispatch')]
-    public function dispatch(string $class, array $payload): array;
+    public function dispatch(string $class, array $payload): mixed;
 }
