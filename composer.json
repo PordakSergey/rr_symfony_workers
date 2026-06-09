@@ -34,7 +34,7 @@
     "nyholm/psr7": "^1.8",
     "doctrine/doctrine-bundle": "^3.0",
     "doctrine/orm": "^3.0",
-    "temporal/sdk": "2.16.0"
+    "temporal/sdk": "2.17.1"
   },
   "autoload": {
     "psr-4": {
