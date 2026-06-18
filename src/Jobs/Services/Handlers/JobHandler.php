@@ -37,7 +37,7 @@ final class JobHandler implements JobHandlerInterface
             $taskName = $task->getName();
             $job = $this->jobMap->getByName($taskName);
 
-            $command = $this->serializer->deserialize($task->getPayload(), $job::class, 'json');
+            $command = $this->serializer->deserialize($task->getPayload(), $job, 'json');
             $this->messageBus->dispatch($command);
         } catch (ExceptionInterface|\Symfony\Component\Serializer\Exception\ExceptionInterface $e) {
             $this->logger->error('Failed dispatch job', ['exception' => $e->getMessage()]);
