@@ -8,7 +8,9 @@ use Rr\Bundle\Workers\Contracts\Workers\WorkerInterface;
 use Rr\Bundle\Workers\Factories\RPCFactory;
 use Rr\Bundle\Workers\Handlers\MessengerJobDispatcherHandler;
 use Rr\Bundle\Workers\Handlers\RequestHandler;
+use Rr\Bundle\Workers\Jobs\Contracts\Services\Map\JobMapInterface;
 use Rr\Bundle\Workers\Jobs\Services\JobsDispatcher\RrJobDispatcher;
+use Rr\Bundle\Workers\Jobs\Services\Mapper\JobsMapper;
 use Rr\Bundle\Workers\Middlewares\DoctrineORMMiddleware;
 use Rr\Bundle\Workers\Storage\WorkerStorage;
 use Rr\Bundle\Workers\Temporal\Contracts\Services\Cron\CronMapInterface;
@@ -108,6 +110,7 @@ return static function (ContainerConfigurator $container) {
     $services->set(RrJobDispatcher::class)->autowire()->public()->tag('jobs.dispatcher.rr');
     $services->set(TemporalJobDispatcher::class)->autowire()->public()->tag('jobs.dispatcher.temporal');
     $services->set(JobDispatcherInterface::class, service(TemporalJobDispatcher::class));
+    $services->set(JobMapInterface::class, JobsMapper::class);
 
     // Cron
     $services->set(CronMapInterface::class, CronMap::class);

@@ -13,5 +13,5 @@ interface JobMapInterface
      * @param string $name
      * @return object
      */
-    public function getByName(string $name) : object;
+    public function getByName(string $name) : string;
 }
