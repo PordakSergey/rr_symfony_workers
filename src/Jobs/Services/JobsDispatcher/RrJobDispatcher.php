@@ -38,7 +38,7 @@ class RrJobDispatcher implements JobDispatcherInterface
     {
         try {
             $jobs = new Jobs($this->rpcFactory::fromEnvironment(Environment::fromGlobals()));
-            $queue = $jobs->connect('job');
+            $queue = $jobs->connect('flights.storage');
             $task = $queue->create($command::class, $this->serializer->serialize($command, 'json'), new Options());
             $sendTask = $queue->dispatch($task);
 

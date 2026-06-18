@@ -16,7 +16,6 @@ use Rr\Bundle\Workers\Temporal\Factories\TemporalClientScheduleFactory;
 use Rr\Bundle\Workers\Temporal\Factories\TemporalClientServiceFactory;
 use Rr\Bundle\Workers\Temporal\Factories\TemporalClientWorkflowFactory;
 use Rr\Bundle\Workers\Temporal\Services\Activities\MessengerActivity;
-use Rr\Bundle\Workers\Temporal\Services\Activities\MessengerPoolActivity;
 use Rr\Bundle\Workers\Temporal\Services\Cron\CronMap;
 use Rr\Bundle\Workers\Temporal\Services\JobsDispatcher\TemporalJobDispatcher;
 use Rr\Bundle\Workers\Temporal\Services\Storage\TemporalStorage;
@@ -96,7 +95,7 @@ return static function (ContainerConfigurator $container) {
     $services->set(WorkflowClientInterface::class)->factory([service(TemporalClientWorkflowFactory::class), 'make']);
     $services->set(ScheduleClientInterface::class)->factory([service(TemporalClientScheduleFactory::class), 'make']);
 
-    // Activities & Workflows
+    // Temporal
     $services->set(TemporalStorage::class)->autowire()->public()
         ->bind('iterable $activities', tagged_iterator('temporal.activity'))
         ->bind('iterable $workflows', tagged_iterator('temporal.workflow'));
