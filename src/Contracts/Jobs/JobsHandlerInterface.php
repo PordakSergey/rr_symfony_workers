@@ -9,14 +9,16 @@ interface JobsHandlerInterface
     /**
      * @param object $command
      * @param bool $returnResult
+     * @param string $tag
      * @return JobResponse
      */
-    public function dispatch(object $command, bool $returnResult = false): JobResponse;
+    public function dispatch(object $command, bool $returnResult = false, string $tag = 'messenger'): JobResponse;
 
     /**
      * @param array $commands
      * @param bool $returnResult
+     * @param string $tag
      * @return JobResponse[]
      */
-    public function dispatchPool(array $commands, bool $returnResult = false): array;
+    public function dispatchPool(array $commands, bool $returnResult = false, string $tag = 'messenger'): array;
 }

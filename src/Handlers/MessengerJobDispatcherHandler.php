@@ -22,9 +22,9 @@ class MessengerJobDispatcherHandler implements JobsHandlerInterface
      * @param bool $returnResult
      * @return JobResponse
      */
-    public function dispatch(object $command, bool $returnResult = false): JobResponse
+    public function dispatch(object $command, bool $returnResult = false, string $tag = 'messenger'): JobResponse
     {
-        return $this->jobsDispatcher->dispatch($command, $returnResult);
+        return $this->jobsDispatcher->dispatch($command, $returnResult, $tag);
     }
 
     /**
@@ -32,8 +32,8 @@ class MessengerJobDispatcherHandler implements JobsHandlerInterface
      * @param bool $returnResult
      * @return array|JobResponse[]
      */
-    public function dispatchPool(array $commands, bool $returnResult = false): array
+    public function dispatchPool(array $commands, bool $returnResult = false, string $tag = 'messenger'): array
     {
-        return $this->jobsDispatcher->dispatchPool($commands, $returnResult);
+        return $this->jobsDispatcher->dispatchPool($commands, $returnResult, $tag);
     }
 }
