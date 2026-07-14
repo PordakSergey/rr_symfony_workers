@@ -30,17 +30,15 @@ final class JobHandler implements JobHandlerInterface
     /**
      * @param ReceivedTaskInterface $task
      * @return void
+     * @throws ExceptionInterface
+     * @throws \Symfony\Component\Serializer\Exception\ExceptionInterface
      */
     public function handle(ReceivedTaskInterface $task): void
     {
-        try {
-            $job = $this->jobMap->getByName($task->getName());
-            $payload = $task->getPayload();
+        $job = $this->jobMap->getByName($task->getName());
+        $payload = $task->getPayload();
 
-            $command = $this->serializer->deserialize($payload, $job, 'json');
-            $this->messageBus->dispatch($command);
-        } catch (ExceptionInterface|\Symfony\Component\Serializer\Exception\ExceptionInterface $e) {
-            $this->logger->error('Failed dispatch job '.$e->getMessage(), ['exception' => $e->getMessage()]);
-        }
+        $command = $this->serializer->deserialize($payload, $job, 'json');
+        $this->messageBus->dispatch($command);
     }
 }

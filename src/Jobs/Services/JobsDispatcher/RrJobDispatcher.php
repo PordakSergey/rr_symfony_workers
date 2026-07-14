@@ -32,9 +32,10 @@ class RrJobDispatcher implements JobDispatcherInterface
     /**
      * @param object $command
      * @param bool $returnResult
+     * @param string $tag
      * @return JobResponse
      */
-    public function dispatch(object $command, bool $returnResult = false): JobResponse
+    public function dispatch(object $command, bool $returnResult = false, string $tag = 'messenger'): JobResponse
     {
         try {
             $jobs = new Jobs($this->rpcFactory::fromEnvironment(Environment::fromGlobals()));
@@ -52,10 +53,11 @@ class RrJobDispatcher implements JobDispatcherInterface
     /**
      * @param array $commands
      * @param bool $returnResult
+     * @param string $tag
      * @return array|JobResponse[]
      * @throws NotImplementedException
      */
-    public function dispatchPool(array $commands, bool $returnResult = false): array
+    public function dispatchPool(array $commands, bool $returnResult = false, string $tag = 'messenger'): array
     {
         throw new NotImplementedException('Not implemented');
     }

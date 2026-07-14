@@ -27,16 +27,17 @@ class TemporalJobDispatcher implements JobDispatcherInterface
     /**
      * @param object $command
      * @param bool $returnResult
+     * @param string $tag
      * @return JobResponse
      * @throws ExceptionInterface
      */
-    public function dispatch(object $command, bool $returnResult = false): JobResponse
+    public function dispatch(object $command, bool $returnResult = false, string $tag = 'messenger'): JobResponse
     {
         $workflow = $this->client->newWorkflowStub(
             MessengerWorkflow::class,
             WorkflowOptions::new()
                 ->withTaskQueue('taskQueue')
-                ->withWorkflowId('messenger-' . uniqid())
+                ->withWorkflowId($tag. '-' . uniqid())
         );
 
         $payload = $this->serializer->normalize($command, 'json');
@@ -52,16 +53,17 @@ class TemporalJobDispatcher implements JobDispatcherInterface
     /**
      * @param array $commands
      * @param bool $returnResult
+     * @param string $tag
      * @return array|JobResponse[]
      * @throws ExceptionInterface
      */
-    public function dispatchPool(array $commands, bool $returnResult = false): array
+    public function dispatchPool(array $commands, bool $returnResult = false, string $tag = 'messenger'): array
     {
         $workflow = $this->client->newWorkflowStub(
             MessengerPoolWorkflow::class,
             WorkflowOptions::new()
                 ->withTaskQueue('taskQueue')
-                ->withWorkflowId('messenger-' . uniqid())
+                ->withWorkflowId($tag .'-'. uniqid())
         );
 
         $request = [];
