@@ -26,11 +26,15 @@ class MessengerPoolWorkflow implements MessengerPoolWorkflowInterface
             ActivityOptions::new()
                 ->withStartToCloseTimeout(CarbonInterval::minutes(3))
                 ->withTaskQueue('taskQueue')
-                ->withRetryOptions(RetryOptions::new()->withMaximumAttempts(1))
+                ->withRetryOptions(RetryOptions::new()
+                    ->withMaximumAttempts(2)
+                    ->withInitialInterval(CarbonInterval::second(3))
+                )
         );
 
         $promises = array_map(function ($command) use ($activity) {
-            return $activity->dispatch($command['class'], $command['payload']);
+            return $activity->dispatch($command['class'], $command['payload'])
+                ->catch(fn(\Throwable $e) => ['error' => $e->getMessage()]);
         }, $commands);
 
         return yield Promise::all($promises);

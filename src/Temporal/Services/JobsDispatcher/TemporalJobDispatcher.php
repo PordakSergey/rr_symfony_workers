@@ -2,6 +2,7 @@
 
 namespace Rr\Bundle\Workers\Temporal\Services\JobsDispatcher;
 
+use Carbon\CarbonInterval;
 use Rr\Bundle\Workers\Contracts\Jobs\JobDispatcherInterface;
 use Rr\Bundle\Workers\Jobs\Response\JobResponse;
 use Rr\Bundle\Workers\Temporal\Services\Workflows\MessengerPoolWorkflow;
@@ -64,6 +65,7 @@ class TemporalJobDispatcher implements JobDispatcherInterface
             WorkflowOptions::new()
                 ->withTaskQueue('taskQueue')
                 ->withWorkflowId($tag .'-'. uniqid())
+                ->withWorkflowExecutionTimeout(CarbonInterval::minutes(10))
         );
 
         $request = [];
