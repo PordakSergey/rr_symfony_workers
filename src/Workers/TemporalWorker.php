@@ -14,8 +14,10 @@ use Temporal\WorkerFactory;
 
 final class TemporalWorker implements WorkerInterface
 {
-    protected const int MAX_CONCURRENT_ACTIVITIES = 10;
-    protected const int MAX_CONCURRENT_WORKFLOWS = 10;
+    protected const int MAX_CONCURRENT_ACTIVITIES = 100;
+    protected const int MAX_CONCURRENT_WORKFLOWS = 100;
+    private const int ACTIVITY_POLLERS = 10;
+    private const int WORKFLOW_POLLERS = 5;
 
     /**
      * @param KernelInterface $kernel
@@ -40,6 +42,8 @@ final class TemporalWorker implements WorkerInterface
             \Temporal\Worker\WorkerOptions::new()
                 ->withMaxConcurrentActivityExecutionSize(self::MAX_CONCURRENT_ACTIVITIES)
                 ->withMaxConcurrentWorkflowTaskExecutionSize(self::MAX_CONCURRENT_WORKFLOWS)
+                ->withMaxConcurrentActivityTaskPollers(self::ACTIVITY_POLLERS)
+                ->withMaxConcurrentWorkflowTaskPollers(self::WORKFLOW_POLLERS)
         );
 
         foreach ( $this->storage->getActivities() as $activity) {
