@@ -36,6 +36,8 @@ use Spiral\RoadRunner\Http\HttpWorker as RoadRunnerHttpWorker;
 use Spiral\RoadRunner\Http\HttpWorkerInterface;
 use Spiral\RoadRunner\Jobs\Consumer;
 use Spiral\RoadRunner\Jobs\ConsumerInterface;
+use Spiral\RoadRunner\Jobs\Jobs;
+use Spiral\RoadRunner\Jobs\JobsInterface;
 use Spiral\RoadRunner\Worker as RoadRunnerWorker;
 use Spiral\RoadRunner\WorkerInterface as RoadRunnerWorkerInterface;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
@@ -78,6 +80,7 @@ return static function (ContainerConfigurator $container) {
         ->args([service(EnvironmentInterface::class)]);
 
     $services->set(ConsumerInterface::class, Consumer::class);
+    $services->set(JobsInterface::class, Jobs::class)->args([service(RPCInterface::class)]);
     $services->set(InvokerInterface::class, Invoker::class);
 
     // autoload
@@ -107,8 +110,8 @@ return static function (ContainerConfigurator $container) {
 
     // Jobs
     $services->set(JobsHandlerInterface::class, service(MessengerJobDispatcherHandler::class));
-    $services->set(RrJobDispatcher::class)->autowire()->public()->tag('jobs.dispatcher.rr');
-    $services->set(TemporalJobDispatcher::class)->autowire()->public()->tag('jobs.dispatcher.temporal');
+    $services->set(RrJobDispatcher::class)->autowire()->public();
+    $services->set(TemporalJobDispatcher::class)->autowire()->public();
     $services->set(JobDispatcherInterface::class, service(TemporalJobDispatcher::class));
     $services->set(JobMapInterface::class, JobsMapper::class);
 

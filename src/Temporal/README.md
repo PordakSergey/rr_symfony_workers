@@ -61,7 +61,8 @@ Activity создаются через контейнер (можно инжек
 
 ## Отправка задач
 
-`JobDispatcherInterface` по умолчанию указывает на `TemporalJobDispatcher`.
+`JobDispatcherInterface` реализует только `TemporalJobDispatcher`.
+RR-очередь — отдельный класс `RrJobDispatcher` со своим API.
 
 ```php
 public function __construct(private JobDispatcherInterface $jobs) {}

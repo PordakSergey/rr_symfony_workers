@@ -5,7 +5,7 @@ namespace Rr\Bundle\Workers\DependencyInjection;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Rr\Bundle\Workers\Cache\KvCacheAdapter;
-use Rr\Bundle\Workers\Contracts\Jobs\JobDispatcherInterface;
+use Rr\Bundle\Workers\Jobs\Services\JobsDispatcher\RrJobDispatcher;
 use Rr\Bundle\Workers\Middlewares\DoctrineORMMiddleware;
 use Rr\Bundle\Workers\Temporal\Services\JobsDispatcher\TemporalJobDispatcher;
 use Rr\Bundle\Workers\Workers\TemporalWorker;
@@ -42,9 +42,8 @@ class RrWorkersExtension extends Extension
             $this->configureKv($config, $container);
         }
 
-        /*if (!empty($config['jobs']['dispatcher'])) {
-            $this->configureJobs($config, $container);
-        }*/
+        $container->getDefinition(RrJobDispatcher::class)
+            ->setArgument('$defaultQueue', $config['jobs']['default_queue']);
 
         $container->getDefinition(TemporalWorker::class)
             ->setArgument('$workers', $config['temporal']['workers']);
@@ -90,34 +89,6 @@ class RrWorkersExtension extends Extension
                     'rpc' => $container->getDefinition(RPCInterface::class),
                     'storage' => $storage,
                 ]]);
-        }
-    }
-
-    /**
-     * @param array $config
-     * @param ContainerBuilder $container
-     * @return void
-     * @throws \Exception
-     */
-    public function configureJobs(array $config, ContainerBuilder $container): void
-    {
-        $dispatcherConfig = $config['jobs']['dispatcher'];
-        $dispatchers = $container->findTaggedServiceIds($dispatcherConfig);
-        if (empty($dispatchers[array_key_first($dispatchers)])) {
-            throw new LogicException("Jobs dispatcher '$dispatcherConfig' not found.");
-        }
-
-        foreach ($dispatchers as $id => $service) {
-            $dispatcher = $container->findDefinition($id);
-            $class = $dispatcher->getClass();
-
-            if (!is_a($class, JobDispatcherInterface::class, true)) {
-                throw new LogicException(\sprintf("Jobs dispatcher should implements '%s'.", JobDispatcherInterface::class));
-            }
-
-            $container->register(JobDispatcherInterface::class, $dispatcher::class);
-
-            break;
         }
     }
 }
