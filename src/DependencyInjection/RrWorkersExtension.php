@@ -7,6 +7,8 @@ use Doctrine\Persistence\ManagerRegistry;
 use Rr\Bundle\Workers\Cache\KvCacheAdapter;
 use Rr\Bundle\Workers\Contracts\Jobs\JobDispatcherInterface;
 use Rr\Bundle\Workers\Middlewares\DoctrineORMMiddleware;
+use Rr\Bundle\Workers\Temporal\Services\JobsDispatcher\TemporalJobDispatcher;
+use Rr\Bundle\Workers\Workers\TemporalWorker;
 use Spiral\Goridge\RPC\RPC;
 use Spiral\Goridge\RPC\RPCInterface;
 use Spiral\RoadRunner\GRPC\ServiceInterface;
@@ -43,6 +45,11 @@ class RrWorkersExtension extends Extension
         /*if (!empty($config['jobs']['dispatcher'])) {
             $this->configureJobs($config, $container);
         }*/
+
+        $container->getDefinition(TemporalWorker::class)
+            ->setArgument('$workers', $config['temporal']['workers']);
+        $container->getDefinition(TemporalJobDispatcher::class)
+            ->setArgument('$taskQueue', $config['temporal']['default_queue']);
 
         $container
             ->register(DoctrineORMMiddleware::class)

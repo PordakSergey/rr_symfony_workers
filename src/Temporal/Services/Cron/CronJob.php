@@ -4,6 +4,7 @@ namespace Rr\Bundle\Workers\Temporal\Services\Cron;
 
 use Rr\Bundle\Workers\Temporal\Contracts\Services\Cron\CronJobInterface;
 use Rr\Bundle\Workers\Temporal\Services\Workflows\MessengerWorkflow;
+use Rr\Bundle\Workers\Workers\TemporalWorker;
 use Symfony\Component\DependencyInjection\Attribute\Exclude;
 
 #[Exclude]
@@ -12,7 +13,8 @@ class CronJob implements CronJobInterface
     public function __construct(
         protected string $taskId,
         protected string $cron,
-        protected object $command
+        protected object $command,
+        protected string $taskQueue = TemporalWorker::DEFAULT_TASK_QUEUE,
     )
     {}
 
@@ -61,6 +63,6 @@ class CronJob implements CronJobInterface
      */
     public function getTaskQueue(): string
     {
-        return 'taskQueue';
+        return $this->taskQueue;
     }
 }

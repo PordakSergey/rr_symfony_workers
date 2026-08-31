@@ -7,6 +7,7 @@ use Rr\Bundle\Workers\Contracts\Jobs\JobDispatcherInterface;
 use Rr\Bundle\Workers\Jobs\Response\JobResponse;
 use Rr\Bundle\Workers\Temporal\Services\Workflows\MessengerPoolWorkflow;
 use Rr\Bundle\Workers\Temporal\Services\Workflows\MessengerWorkflow;
+use Rr\Bundle\Workers\Workers\TemporalWorker;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Temporal\Client\WorkflowClientInterface;
@@ -17,10 +18,12 @@ class TemporalJobDispatcher implements JobDispatcherInterface
     /**
      * @param WorkflowClientInterface $client
      * @param NormalizerInterface $serializer
+     * @param string $taskQueue From rr_bundle.temporal.default_queue
      */
     public function __construct(
         protected WorkflowClientInterface $client,
         protected NormalizerInterface     $serializer,
+        protected string                  $taskQueue = TemporalWorker::DEFAULT_TASK_QUEUE,
     )
     {
     }
@@ -29,15 +32,16 @@ class TemporalJobDispatcher implements JobDispatcherInterface
      * @param object $command
      * @param bool $returnResult
      * @param string $tag
+     * @param string|null $queue
      * @return JobResponse
      * @throws ExceptionInterface
      */
-    public function dispatch(object $command, bool $returnResult = false, string $tag = 'messenger'): JobResponse
+    public function dispatch(object $command, bool $returnResult = false, string $tag = 'messenger', ?string $queue = null): JobResponse
     {
         $workflow = $this->client->newWorkflowStub(
             MessengerWorkflow::class,
             WorkflowOptions::new()
-                ->withTaskQueue('taskQueue')
+                ->withTaskQueue($queue ?? $this->taskQueue)
                 ->withWorkflowId($tag. '-' . uniqid())
         );
 
@@ -55,15 +59,16 @@ class TemporalJobDispatcher implements JobDispatcherInterface
      * @param array $commands
      * @param bool $returnResult
      * @param string $tag
+     * @param string|null $queue
      * @return array|JobResponse[]
      * @throws ExceptionInterface
      */
-    public function dispatchPool(array $commands, bool $returnResult = false, string $tag = 'messenger'): array
+    public function dispatchPool(array $commands, bool $returnResult = false, string $tag = 'messenger', ?string $queue = null): array
     {
         $workflow = $this->client->newWorkflowStub(
             MessengerPoolWorkflow::class,
             WorkflowOptions::new()
-                ->withTaskQueue('taskQueue')
+                ->withTaskQueue($queue ?? $this->taskQueue)
                 ->withWorkflowId($tag .'-'. uniqid())
                 ->withWorkflowExecutionTimeout(CarbonInterval::minutes(10))
         );

@@ -25,7 +25,6 @@ class MessengerPoolWorkflow implements MessengerPoolWorkflowInterface
             MessengerActivityInterface::class,
             ActivityOptions::new()
                 ->withStartToCloseTimeout(CarbonInterval::minutes(3))
-                ->withTaskQueue('taskQueue')
                 ->withRetryOptions(RetryOptions::new()
                     ->withMaximumAttempts(2)
                     ->withInitialInterval(CarbonInterval::second(3))

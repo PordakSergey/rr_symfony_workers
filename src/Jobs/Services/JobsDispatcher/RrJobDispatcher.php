@@ -33,15 +33,16 @@ class RrJobDispatcher implements JobDispatcherInterface
      * @param object $command
      * @param bool $returnResult
      * @param string $tag
+     * @param string|null $queue RoadRunner pipeline name
      * @return JobResponse
      */
-    public function dispatch(object $command, bool $returnResult = false, string $tag = 'messenger'): JobResponse
+    public function dispatch(object $command, bool $returnResult = false, string $tag = 'messenger', ?string $queue = null): JobResponse
     {
         try {
             $jobs = new Jobs($this->rpcFactory::fromEnvironment(Environment::fromGlobals()));
-            $queue = $jobs->connect('flights.storage');
-            $task = $queue->create($command::class, $this->serializer->serialize($command, 'json'), new Options());
-            $sendTask = $queue->dispatch($task);
+            $pipeline = $jobs->connect($queue ?? 'flights.storage');
+            $task = $pipeline->create($command::class, $this->serializer->serialize($command, 'json'), new Options());
+            $sendTask = $pipeline->dispatch($task);
 
             return new JobResponse( $sendTask->getId(), null);
         } catch (JobsException|ExceptionInterface $e) {
@@ -54,10 +55,11 @@ class RrJobDispatcher implements JobDispatcherInterface
      * @param array $commands
      * @param bool $returnResult
      * @param string $tag
+     * @param string|null $queue
      * @return array|JobResponse[]
      * @throws NotImplementedException
      */
-    public function dispatchPool(array $commands, bool $returnResult = false, string $tag = 'messenger'): array
+    public function dispatchPool(array $commands, bool $returnResult = false, string $tag = 'messenger', ?string $queue = null): array
     {
         throw new NotImplementedException('Not implemented');
     }
