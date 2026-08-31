@@ -6,8 +6,8 @@ Temporal-часть бандла: воркер, клиенты, dispatcher за�
 
 * `temporal/sdk` (уже в зависимостях), запущенный Temporal server;
 * RoadRunner с включённой секцией `temporal`;
-* переменная окружения `TEMPORAL_URL` (например `localhost:7233`). Без неё
-  `TemporalClientServiceFactory` бросит `BadConfigurationException`.
+* переменная окружения `TEMPORAL_URL` (например `temporal:7233`) — необязательна,
+  по умолчанию `localhost:7233`.
 
 ```yaml
 # .rr.yaml
@@ -135,7 +135,7 @@ php bin/console temporal:schedule:upsert
 
 | Путь | Зачем |
 |---|---|
-| `Factories/` | `ServiceClient`, `WorkflowClient`, `ScheduleClient` из `TEMPORAL_URL` |
+| `Factories/` | `ServiceClient`, `WorkflowClient`, `ScheduleClient` из `TEMPORAL_URL` (по умолчанию `localhost:7233`) |
 | `Services/Storage/TemporalStorage.php` | собирает activity/workflow по тегам |
 | `Services/Workflows/` | `MessengerWorkflow` (одна команда), `MessengerPoolWorkflow` (пачка) |
 | `Services/Activities/MessengerActivity.php` | денормализация + Messenger bus |

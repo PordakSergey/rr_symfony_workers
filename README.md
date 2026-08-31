@@ -235,13 +235,29 @@ framework:
 `WorkerStartEvent` / `WorkerStopEvent` — старт и остановка HTTP-воркера,
 `KernelRebootEvent` — заготовка под перезагрузку ядра.
 
+## Тесты
+
+```bash
+composer install && composer test
+```
+
+`tests/` — PHPUnit 11:
+
+* `Jobs/` — `RrJobDispatcher`: очереди, опции, пуш пачкой;
+* `Temporal/` — `TemporalJobDispatcher` (workflow, очереди, результаты), `MessengerActivity`,
+  `TemporalStorage`, `TemporalScheduleUpsertCommand` (создание/обновление/удаление расписаний);
+* `DependencyInjection/` — разбор конфига бандла.
+
+Не покрыты воркеры (`HttpWorker` / `JobsWorker` / `GrpcWorker` / `TemporalWorker`) и сами
+workflow — им нужен живой RoadRunner и Temporal-сервер.
+
 ## Известные особенности
 
 * `JobDispatcherInterface` — только Temporal. RR-очередь инжектится классом
   `RrJobDispatcher`, у неё своё API (`push()` / `pushMany()`).
 * `RrJobDispatcher` требует включённой секции `rpc` в `.rr.yaml`.
-* `TEMPORAL_URL` нужен всегда, когда контейнер создаёт temporal-клиенты, даже если приложение
-  работает только в HTTP-режиме.
+* `TEMPORAL_URL` не обязателен: без него клиенты берут `localhost:7233`
+  (`TemporalClientServiceFactory::DEFAULT_ADDRESS`).
 
 ## Структура
 

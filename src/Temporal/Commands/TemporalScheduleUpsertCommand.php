@@ -52,13 +52,12 @@ final class TemporalScheduleUpsertCommand extends Command
 
         $wantedIds = [];
         foreach ($this->cronMap->getAll() as $cronJob) {
-            $taskId = self::TASK_PREFIX . $cronJob->getTaskId();
-
             if (!is_a($cronJob, CronJobInterface::class)) {
                 $output->writeln("  <comment>Command job must be implemented CronJobInterface</comment>");
                 return Command::FAILURE;
             }
 
+            $taskId = self::TASK_PREFIX . $cronJob->getTaskId();
             $wantedIds[$taskId] = true;
 
             $args = [
