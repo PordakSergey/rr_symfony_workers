@@ -15,7 +15,7 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder(): TreeBuilder
     {
-        $builder = new TreeBuilder("rr_bundle");
+        $builder = new TreeBuilder("rr_workers");
 
         /** @var ArrayNodeDefinition $root */
         $root = $builder->getRootNode();
