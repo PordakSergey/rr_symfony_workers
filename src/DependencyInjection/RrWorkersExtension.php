@@ -43,7 +43,8 @@ class RrWorkersExtension extends Extension
         }
 
         $container->getDefinition(RrJobDispatcher::class)
-            ->setArgument('$defaultQueue', $config['jobs']['default_queue']);
+            ->setArgument('$defaultQueue', $config['jobs']['default_queue'])
+            ->setArgument('$queues', $config['jobs']['queues']);
 
         $container->getDefinition(TemporalWorker::class)
             ->setArgument('$workers', $config['temporal']['workers']);

@@ -3,6 +3,7 @@
 namespace Rr\Bundle\Workers\DependencyInjection;
 
 use Rr\Bundle\Workers\Workers\TemporalWorker;
+use Spiral\RoadRunner\Jobs\OptionsInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -38,6 +39,18 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('default_queue')
                             ->info('RoadRunner pipeline used by RrJobDispatcher when no queue is given.')
                             ->defaultValue('default')
+                        ->end()
+                        ->arrayNode('queues')
+                            ->info('Pipeline name (из .rr.yaml) => default task options. Опции push() их перекрывают.')
+                            ->useAttributeAsKey('queue')
+                            ->defaultValue(['default' => []])
+                            ->arrayPrototype()
+                                ->children()
+                                    ->integerNode('delay')->defaultValue(OptionsInterface::DEFAULT_DELAY)->end()
+                                    ->integerNode('priority')->defaultValue(OptionsInterface::DEFAULT_PRIORITY)->end()
+                                    ->booleanNode('auto_ack')->defaultValue(OptionsInterface::DEFAULT_AUTO_ACK)->end()
+                                ->end()
+                            ->end()
                         ->end()
                     ->end()
                 ->end()

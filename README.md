@@ -65,6 +65,9 @@ rr_workers:
     storages: ['local', 'redis']   # имена storage из секции kv в .rr.yaml
   jobs:
     default_queue: default         # пайплайн по умолчанию для RrJobDispatcher
+    queues:
+      default: ~
+      flights.storage: { priority: 10 }
   temporal:
     default_queue: taskQueue
     workers:
@@ -182,21 +185,29 @@ $this->jobs->dispatchPool([new SendEmail(1), new SendEmail(2)], returnResult: tr
 ```php
 public function __construct(private RrJobDispatcher $queue) {}
 
-$id = $this->queue->push(new SendEmail($id));
-$id = $this->queue->push(new SendEmail($id), 'flights.storage', (new Options())->withDelay(60));
-$ids = $this->queue->pushMany([new SendEmail(1), new SendEmail(2)]);
+$id  = $this->queue->push(new SendEmail($id));                     // default_queue
+$id  = $this->queue->push(new SendEmail($id), 'flights.storage');  // конкретная очередь
+$id  = $this->queue->push(new SendEmail($id), 'slow', (new Options())->withDelay(60));
+$ids = $this->queue->pushMany([new SendEmail(1), new SendEmail(2)], 'flights.storage');
 ```
 
-Пайплайн по умолчанию:
+Очереди и их опции по умолчанию — как `temporal.workers`, только для пайплайнов:
 
 ```yaml
 rr_workers:
   jobs:
     default_queue: default
+    queues:
+      default: ~                              # без опций
+      flights.storage: { priority: 10 }
+      slow: { delay: 60, priority: 1, auto_ack: false }
 ```
 
-`Spiral\RoadRunner\Jobs\Options` — задержка, приоритет, auto-ack. Ошибка пуша
-бросает `JobsException`, задача не теряется молча.
+Сами пайплайны объявляются в `.rr.yaml` (`jobs.pipelines`), здесь — только дефолтные
+опции задач. `Options` в `push()` перекрывают конфиг (`Options::mergeOptional`).
+Очередь, которой нет в `queues`, работает без дефолтных опций.
+
+Ошибка пуша бросает `JobsException`, задача не теряется молча.
 
 ## KV-кэш
 
