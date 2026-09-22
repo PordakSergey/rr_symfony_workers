@@ -4,6 +4,7 @@ namespace Rr\Bundle\Workers\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
 use Rr\Bundle\Workers\DependencyInjection\Configuration;
+use Rr\Bundle\Workers\Temporal\Services\Activities\MessengerActivityOptions;
 use Rr\Bundle\Workers\Workers\TemporalWorker;
 use Symfony\Component\Config\Definition\Processor;
 
@@ -16,6 +17,25 @@ final class ConfigurationTest extends TestCase
         self::assertSame('default', $config['jobs']['default_queue']);
         self::assertSame(['default' => []], $config['jobs']['queues']);
         self::assertSame(TemporalWorker::DEFAULT_TASK_QUEUE, $config['temporal']['default_queue']);
+        self::assertSame(
+            [
+                'start_to_close_timeout' => MessengerActivityOptions::START_TO_CLOSE_TIMEOUT,
+                'maximum_attempts' => MessengerActivityOptions::MAXIMUM_ATTEMPTS,
+                'initial_interval' => MessengerActivityOptions::INITIAL_INTERVAL,
+            ],
+            $config['temporal']['activity'],
+        );
+    }
+
+    public function testActivityOptionsAreOverridableOneByOne(): void
+    {
+        $config = $this->process(['temporal' => ['activity' => ['maximum_attempts' => 0]]]);
+
+        self::assertSame(0, $config['temporal']['activity']['maximum_attempts'], '0 — бесконечные попытки');
+        self::assertSame(
+            MessengerActivityOptions::START_TO_CLOSE_TIMEOUT,
+            $config['temporal']['activity']['start_to_close_timeout'],
+        );
     }
 
     public function testQueueOptionsGetFilledIn(): void
@@ -38,6 +58,17 @@ final class ConfigurationTest extends TestCase
             ],
             $config['jobs']['queues'],
         );
+    }
+
+    public function testDebugDropsActivityRetries(): void
+    {
+        $config = (new Processor())->processConfiguration(new Configuration(true), [[]]);
+
+        self::assertSame(1, $config['temporal']['activity']['maximum_attempts']);
+        self::assertSame(3600, $config['temporal']['activity']['start_to_close_timeout']);
+        self::assertSame(5, (new Processor())
+            ->processConfiguration(new Configuration(true), [['temporal' => ['activity' => ['maximum_attempts' => 5]]]])
+            ['temporal']['activity']['maximum_attempts'], 'явный конфиг сильнее debug-дефолта');
     }
 
     private function process(array $config): array

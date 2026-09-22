@@ -12,6 +12,7 @@ use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Temporal\Client\WorkflowClientInterface;
 use Temporal\Client\WorkflowOptions;
+use Temporal\Common\RetryOptions;
 
 class TemporalJobDispatcher implements JobDispatcherInterface
 {
@@ -19,11 +20,13 @@ class TemporalJobDispatcher implements JobDispatcherInterface
      * @param WorkflowClientInterface $client
      * @param NormalizerInterface $serializer
      * @param string $taskQueue From rr_bundle.temporal.default_queue
+     * @param bool $debug kernel.debug: одна попытка workflow, чтобы остановка на брейкпоинте не запускала вторую
      */
     public function __construct(
         protected WorkflowClientInterface $client,
         protected NormalizerInterface     $serializer,
         protected string                  $taskQueue = TemporalWorker::DEFAULT_TASK_QUEUE,
+        protected bool                    $debug = false,
     )
     {
     }
@@ -43,6 +46,7 @@ class TemporalJobDispatcher implements JobDispatcherInterface
             WorkflowOptions::new()
                 ->withTaskQueue($queue ?? $this->taskQueue)
                 ->withWorkflowId($tag. '-' . uniqid())
+                ->withRetryOptions($this->retryOptions())
         );
 
         $payload = $this->serializer->normalize($command, 'json');
@@ -70,7 +74,8 @@ class TemporalJobDispatcher implements JobDispatcherInterface
             WorkflowOptions::new()
                 ->withTaskQueue($queue ?? $this->taskQueue)
                 ->withWorkflowId($tag .'-'. uniqid())
-                ->withWorkflowExecutionTimeout(CarbonInterval::minutes(10))
+                ->withRetryOptions($this->retryOptions())
+                ->withWorkflowExecutionTimeout(CarbonInterval::minutes($this->debug ? 120 : 10))
         );
 
         $request = [];
@@ -94,6 +99,14 @@ class TemporalJobDispatcher implements JobDispatcherInterface
         }
 
         return $results ?? [];
+    }
+
+    /**
+     * @return RetryOptions|null В debug — одна попытка, иначе дефолт temporal (workflow не ретраится)
+     */
+    private function retryOptions(): ?RetryOptions
+    {
+        return $this->debug ? RetryOptions::new()->withMaximumAttempts(1) : null;
     }
 
     /**

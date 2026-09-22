@@ -2,11 +2,9 @@
 
 namespace Rr\Bundle\Workers\Temporal\Services\Workflows;
 
-use Carbon\CarbonInterval;
 use Rr\Bundle\Workers\Temporal\Contracts\Services\Activities\MessengerActivityInterface;
+use Rr\Bundle\Workers\Temporal\Services\Activities\MessengerActivityOptions;
 use Rr\Bundle\Workers\Temporal\Contracts\Services\Workflows\MessengerPoolWorkflowInterface;
-use Temporal\Activity\ActivityOptions;
-use Temporal\Common\RetryOptions;
 use Temporal\Promise;
 use Temporal\Workflow;
 use Temporal\Workflow\WorkflowMethod;
@@ -23,12 +21,7 @@ class MessengerPoolWorkflow implements MessengerPoolWorkflowInterface
     {
         $activity = Workflow::newActivityStub(
             MessengerActivityInterface::class,
-            ActivityOptions::new()
-                ->withStartToCloseTimeout(CarbonInterval::minutes(3))
-                ->withRetryOptions(RetryOptions::new()
-                    ->withMaximumAttempts(2)
-                    ->withInitialInterval(CarbonInterval::second(3))
-                )
+            MessengerActivityOptions::make()
         );
 
         $promises = array_map(function ($command) use ($activity) {

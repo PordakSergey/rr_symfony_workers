@@ -2,11 +2,9 @@
 
 namespace Rr\Bundle\Workers\Temporal\Services\Workflows;
 
-use Carbon\CarbonInterval;
 use Rr\Bundle\Workers\Temporal\Contracts\Services\Activities\MessengerActivityInterface;
+use Rr\Bundle\Workers\Temporal\Services\Activities\MessengerActivityOptions;
 use Rr\Bundle\Workers\Temporal\Contracts\Services\Workflows\MessengerWorkflowInterface;
-use Temporal\Activity\ActivityOptions;
-use Temporal\Common\RetryOptions;
 use Temporal\Workflow;
 use Temporal\Workflow\WorkflowMethod;
 
@@ -23,12 +21,7 @@ class MessengerWorkflow implements MessengerWorkflowInterface
     {
         $activity = Workflow::newActivityStub(
             MessengerActivityInterface::class,
-            ActivityOptions::new()
-                ->withStartToCloseTimeout(CarbonInterval::minutes(3))
-                ->withRetryOptions(RetryOptions::new()
-                    ->withMaximumAttempts(2)
-                    ->withInitialInterval(CarbonInterval::second(3))
-                )
+            MessengerActivityOptions::make()
         );
 
         yield $activity->dispatch($class, $payload);

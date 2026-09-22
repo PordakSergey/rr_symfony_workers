@@ -70,6 +70,10 @@ rr_workers:
       flights.storage: { priority: 10 }
   temporal:
     default_queue: taskQueue
+    activity:                      # опции messenger-activity
+      start_to_close_timeout: 180 # в debug дефолт 3600
+      maximum_attempts: 2         # в debug дефолт 1 (xDebug не ловит вторую попытку)
+      initial_interval: 3
     workers:
       taskQueue: ~
 ```
@@ -245,8 +249,9 @@ composer install && composer test
 
 * `Jobs/` — `RrJobDispatcher`: очереди, опции, пуш пачкой;
 * `Temporal/` — `TemporalJobDispatcher` (workflow, очереди, результаты), `MessengerActivity`,
-  `TemporalStorage`, `TemporalScheduleUpsertCommand` (создание/обновление/удаление расписаний);
-* `DependencyInjection/` — разбор конфига бандла.
+  `MessengerActivityOptions`, `TemporalStorage`, `TemporalScheduleUpsertCommand`
+  (создание/обновление/удаление расписаний), фабрика клиента;
+* `DependencyInjection/` — разбор конфига бандла и проброс его в определения сервисов.
 
 Не покрыты воркеры (`HttpWorker` / `JobsWorker` / `GrpcWorker` / `TemporalWorker`) и сами
 workflow — им нужен живой RoadRunner и Temporal-сервер.

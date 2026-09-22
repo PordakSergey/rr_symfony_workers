@@ -32,8 +32,7 @@ class RrWorkersExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container): void
     {
-        $configuration = new Configuration();
-        $config = $this->processConfiguration($configuration, $configs);
+        $config = $this->processConfiguration($this->getConfiguration($configs, $container), $configs);
 
         $loader = new PhpFileLoader($container, new FileLocator(__DIR__ . "/../../config"));
         $loader->load("services.php");
@@ -47,9 +46,11 @@ class RrWorkersExtension extends Extension
             ->setArgument('$queues', $config['jobs']['queues']);
 
         $container->getDefinition(TemporalWorker::class)
-            ->setArgument('$workers', $config['temporal']['workers']);
+            ->setArgument('$workers', $config['temporal']['workers'])
+            ->setArgument('$activity', $config['temporal']['activity']);
         $container->getDefinition(TemporalJobDispatcher::class)
-            ->setArgument('$taskQueue', $config['temporal']['default_queue']);
+            ->setArgument('$taskQueue', $config['temporal']['default_queue'])
+            ->setArgument('$debug', $this->isDebug($container));
 
         $container
             ->register(DoctrineORMMiddleware::class)
@@ -60,6 +61,25 @@ class RrWorkersExtension extends Extension
             $container->registerForAutoconfiguration(ServiceInterface::class)
                 ->addTag('roadrunner.grpc_service');
         }
+    }
+
+    /**
+     * @param array $config
+     * @param ContainerBuilder $container
+     * @return Configuration
+     */
+    public function getConfiguration(array $config, ContainerBuilder $container): Configuration
+    {
+        return new Configuration($this->isDebug($container));
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     * @return bool
+     */
+    private function isDebug(ContainerBuilder $container): bool
+    {
+        return $container->hasParameter('kernel.debug') && $container->getParameter('kernel.debug');
     }
 
     /**

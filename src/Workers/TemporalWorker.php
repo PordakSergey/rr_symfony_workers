@@ -4,6 +4,7 @@ namespace Rr\Bundle\Workers\Workers;
 
 use ReflectionClass;
 use Rr\Bundle\Workers\Contracts\Workers\WorkerInterface;
+use Rr\Bundle\Workers\Temporal\Services\Activities\MessengerActivityOptions;
 use Rr\Bundle\Workers\Temporal\Services\Storage\TemporalStorage;
 use Spiral\RoadRunner\Environment;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -23,11 +24,13 @@ final class TemporalWorker implements WorkerInterface
      * @param KernelInterface $kernel
      * @param TemporalStorage $storage
      * @param array<string, array> $workers Task queue name => options, from rr_bundle.temporal.workers
+     * @param array<string, int> $activity Activity options, from rr_workers.temporal.activity
      */
     public function __construct(
         protected KernelInterface $kernel,
         protected TemporalStorage $storage,
         protected array $workers = [self::DEFAULT_TASK_QUEUE => []],
+        protected array $activity = [],
     )
     {
     }
@@ -37,6 +40,8 @@ final class TemporalWorker implements WorkerInterface
      */
     public function run(): void
     {
+        MessengerActivityOptions::configure($this->activity);
+
         $factory = WorkerFactory::create();
 
         foreach ($this->workers as $taskQueue => $options) {

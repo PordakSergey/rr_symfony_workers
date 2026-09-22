@@ -2,6 +2,7 @@
 
 namespace Rr\Bundle\Workers\DependencyInjection;
 
+use Rr\Bundle\Workers\Temporal\Services\Activities\MessengerActivityOptions;
 use Rr\Bundle\Workers\Workers\TemporalWorker;
 use Spiral\RoadRunner\Jobs\OptionsInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
@@ -10,6 +11,15 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class Configuration implements ConfigurationInterface
 {
+    public const int DEBUG_START_TO_CLOSE_TIMEOUT = 3600;
+
+    /**
+     * @param bool $debug kernel.debug: в dev activity по умолчанию не ретраится и живёт час,
+     *                    иначе остановка на брейкпоинте xDebug ловит таймаут и вторую попытку.
+     */
+    public function __construct(private bool $debug = false)
+    {
+    }
 
     /**
      * @return TreeBuilder
@@ -60,6 +70,24 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('default_queue')
                             ->info('Task queue used when dispatching jobs and cron jobs.')
                             ->defaultValue(TemporalWorker::DEFAULT_TASK_QUEUE)
+                        ->end()
+                        ->arrayNode('activity')
+                            ->info('Опции activity, которые запускают MessengerWorkflow и MessengerPoolWorkflow.')
+                            ->addDefaultsIfNotSet()
+                            ->children()
+                                ->integerNode('start_to_close_timeout')
+                                    ->info('Секунды на выполнение activity. В debug по умолчанию 3600.')
+                                    ->defaultValue($this->debug ? self::DEBUG_START_TO_CLOSE_TIMEOUT : MessengerActivityOptions::START_TO_CLOSE_TIMEOUT)
+                                ->end()
+                                ->integerNode('maximum_attempts')
+                                    ->info('Сколько раз пробовать, включая первую попытку. 0 — без ограничения. В debug по умолчанию 1.')
+                                    ->defaultValue($this->debug ? 1 : MessengerActivityOptions::MAXIMUM_ATTEMPTS)
+                                ->end()
+                                ->integerNode('initial_interval')
+                                    ->info('Секунды до первой повторной попытки.')
+                                    ->defaultValue(MessengerActivityOptions::INITIAL_INTERVAL)
+                                ->end()
+                            ->end()
                         ->end()
                         ->arrayNode('workers')
                             ->info('Task queue name => worker options. Empty activities/workflows means "register everything tagged".')

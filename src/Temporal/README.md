@@ -27,6 +27,10 @@ temporal:
 rr_workers:
   temporal:
     default_queue: taskQueue      # очередь по умолчанию для dispatcher и cron
+    activity:
+      start_to_close_timeout: 180 # секунд на выполнение activity; в debug дефолт 3600
+      maximum_attempts: 2         # включая первую попытку, 0 — без ограничения; в debug дефолт 1
+      initial_interval: 3         # секунд до первого ретрая
     workers:
       taskQueue: ~                # всё, что помечено тегами, регистрируется в этой очереди
       heavy:
@@ -85,8 +89,16 @@ $this->jobs->dispatch(new BuildReport(), tag: 'report', queue: 'heavy');
 Значит: команда должна быть нормализуемой (без замыканий, ресурсов, Doctrine-прокси),
 а её handler — существовать в приложении, где работает temporal-воркер.
 
-Дефолты activity: `start_to_close = 3 мин`, 2 попытки, начальный интервал 3 с.
-Нужны другие — свой workflow с другими `ActivityOptions`.
+При `kernel.debug` (dev) дефолты другие: `start_to_close_timeout` — 3600, `maximum_attempts` — 1,
+workflow стартуют с `maximumAttempts: 1`, а `dispatchPool` — с execution timeout 2 часа вместо 10 минут.
+Остановка на брейкпоинте xDebug не ловит таймаут и не запускает вторую попытку.
+Явные значения в конфиге сильнее этих дефолтов.
+
+Дефолты activity: `start_to_close = 3 мин`, 2 попытки, начальный интервал 3 с — меняются
+в `rr_workers.temporal.activity` и применяются к обоим messenger-workflow. Значения
+проставляет `TemporalWorker::run()` в `MessengerActivityOptions` (статика: workflow
+инстанцирует сам Temporal, контейнера внутри нет). Нужны разные опции на разные
+команды — свой workflow со своими `ActivityOptions`.
 
 `dispatchPool` с `returnResult: false` возвращает пустой массив: workflow только
 запускается, результаты не собираются. Ошибка отдельной команды в пуле не валит весь пул —
