@@ -5,6 +5,7 @@ namespace Rr\Bundle\Workers\Temporal\Commands;
 use Rr\Bundle\Workers\Temporal\Contracts\Services\Cron\CronJobInterface;
 use Rr\Bundle\Workers\Temporal\Contracts\Services\Cron\CronMapInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -26,12 +27,14 @@ final class TemporalScheduleUpsertCommand extends Command
      * @param CronMapInterface $cronMap
      * @param ScheduleClientInterface $scheduleClient
      * @param NormalizerInterface $serializer
+     * @param string $env
      */
     public function __construct(
         protected CronMapInterface        $cronMap,
         protected ScheduleClientInterface $scheduleClient,
         protected NormalizerInterface     $serializer,
-
+        #[Autowire('%kernel.environment%')]
+        protected string                  $env,
     )
     {
         parent::__construct();
@@ -58,6 +61,13 @@ final class TemporalScheduleUpsertCommand extends Command
             }
 
             $taskId = self::TASK_PREFIX . $cronJob->getTaskId();
+
+            // not in wantedIds -> existing schedule gets deleted below
+            if ($cronJob->getEnvs() && !in_array($this->env, $cronJob->getEnvs(), true)) {
+                $output->writeln("  <comment>skipped ({$this->env})</comment> {$taskId}");
+                continue;
+            }
+
             $wantedIds[$taskId] = true;
 
             $args = [
@@ -66,6 +76,7 @@ final class TemporalScheduleUpsertCommand extends Command
             ];
 
             $action = StartWorkflowAction::new('run')
+                ->withWorkflowId($taskId)
                 ->withTaskQueue($cronJob->getTaskQueue())
                 ->withInput($args);
 

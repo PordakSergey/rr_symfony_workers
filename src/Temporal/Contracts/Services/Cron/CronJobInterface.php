@@ -33,4 +33,10 @@ interface CronJobInterface
      * @return string
      */
     public function getTaskQueue(): string;
+
+    /**
+     * Empty = all environments
+     * @return string[]
+     */
+    public function getEnvs(): array;
 }

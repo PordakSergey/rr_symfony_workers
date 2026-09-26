@@ -15,6 +15,7 @@ class CronJob implements CronJobInterface
         protected string $cron,
         protected object $command,
         protected string $taskQueue = TemporalWorker::DEFAULT_TASK_QUEUE,
+        protected array $envs = [],
     )
     {}
 
@@ -64,5 +65,14 @@ class CronJob implements CronJobInterface
     public function getTaskQueue(): string
     {
         return $this->taskQueue;
+    }
+
+    /**
+     * Empty = all environments
+     * @return string[]
+     */
+    public function getEnvs(): array
+    {
+        return $this->envs;
     }
 }

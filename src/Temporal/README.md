@@ -116,6 +116,7 @@ final class CronMap implements CronMapInterface
         return [
             new CronJob('nightly_report', '0 3 * * *', new BuildReport()),
             new CronJob('cleanup', '*/15 * * * *', new Cleanup(), taskQueue: 'heavy'),
+            new CronJob('sync_prices', '0 * * * *', new SyncPrices(), envs: ['prod', 'stage']),
         ];
     }
 }
@@ -137,7 +138,11 @@ php bin/console temporal:schedule:upsert
 те, чей id начинается с `cron_job_`, но которых больше нет в `CronMap`. Запускайте её при
 деплое.
 
-Идентификатор расписания — `cron_job_` + `getTaskId()`. Таймзона у `CronJob` жёстко `UTC` —
+`envs` — список `APP_ENV` (`%kernel.environment%`), в которых задача активна; пустой (по умолчанию) —
+во всех. В остальных окружениях команда пропускает задачу, а уже созданное расписание удаляет.
+
+Идентификатор расписания — `cron_job_` + `getTaskId()`, он же префикс workflow id запусков
+(Temporal дописывает время: `cron_job_nightly_report-2026-09-26T03:00:00Z`). Таймзона у `CronJob` жёстко `UTC` —
 нужна другая, реализуйте `CronJobInterface` сам.
 
 Расписание всегда стартует workflow-метод `run` (то есть `MessengerWorkflow`);
