@@ -2,6 +2,7 @@
 
 namespace Rr\Bundle\Workers\Tests\Temporal;
 
+use Carbon\CarbonInterval;
 use PHPUnit\Framework\TestCase;
 use Rr\Bundle\Workers\Jobs\Response\JobResponse;
 use Rr\Bundle\Workers\Temporal\Services\JobsDispatcher\TemporalJobDispatcher;
@@ -69,6 +70,17 @@ final class TemporalJobDispatcherTest extends TestCase
 
         self::assertSame('heavy', $this->stub[1]->taskQueue);
         self::assertStringStartsWith('reports-', $this->stub[1]->workflowId);
+    }
+
+    public function testDispatchDelaysWorkflowStartOnlyWhenAsked(): void
+    {
+        $dispatcher = $this->dispatcher($this->client($this->workflowRun('wf-1'), invocations: 2));
+
+        $dispatcher->dispatch(new SendEmail(42));
+        self::assertSame(0, (int) CarbonInterval::instance($this->stub[1]->workflowStartDelay)->totalMilliseconds);
+
+        $dispatcher->dispatch(new SendEmail(42), delayMs: 5000);
+        self::assertSame(5000, (int) CarbonInterval::instance($this->stub[1]->workflowStartDelay)->totalMilliseconds);
     }
 
     public function testWorkflowIdIsUniquePerDispatch(): void

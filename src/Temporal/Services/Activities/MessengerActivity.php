@@ -3,7 +3,9 @@
 namespace Rr\Bundle\Workers\Temporal\Services\Activities;
 
 use Rr\Bundle\Workers\Temporal\Contracts\Services\Activities\MessengerActivityInterface;
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\HandleTrait;
+use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -39,6 +41,7 @@ class MessengerActivity implements MessengerActivityInterface
     {
         $command = $this->denormalizer->denormalize($payload, $class, 'json');
 
-        return $this->handle($command);
+        // ReceivedStamp: иначе класс, замаршрутизированный на temporal-транспорт, уйдёт в Temporal снова
+        return $this->handle(new Envelope($command, [new ReceivedStamp('temporal')]));
     }
 }

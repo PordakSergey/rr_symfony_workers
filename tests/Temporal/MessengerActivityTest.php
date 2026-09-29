@@ -8,6 +8,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\NoHandlerForMessageException;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
+use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 
@@ -20,10 +21,12 @@ final class MessengerActivityTest extends TestCase
         $bus = $this->createMock(MessageBusInterface::class);
         $bus->expects(self::once())
             ->method('dispatch')
-            ->willReturnCallback(function (object $command) use (&$handled): Envelope {
-                $handled = $command;
+            ->willReturnCallback(function (Envelope $envelope) use (&$handled): Envelope {
+                // ReceivedStamp — чтобы temporal-транспорт не отправил команду в Temporal повторно
+                self::assertNotNull($envelope->last(ReceivedStamp::class));
+                $handled = $envelope->getMessage();
 
-                return new Envelope($command, [new HandledStamp('sent', 'handler')]);
+                return $envelope->with(new HandledStamp('sent', 'handler'));
             });
 
         $result = $this->activity($bus)->dispatch(SendEmail::class, ['id' => 42]);

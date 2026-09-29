@@ -104,6 +104,82 @@ workflow стартуют с `maximumAttempts: 1`, а `dispatchPool` — с exec
 запускается, результаты не собираются. Ошибка отдельной команды в пуле не валит весь пул —
 она превращается в `['error' => 'message']`.
 
+## Messenger transport
+
+Вместо явного `JobDispatcherInterface` можно роутить сообщения в Temporal штатным Messenger.
+
+### Настройка
+
+```yaml
+# config/packages/messenger.yaml
+framework:
+  messenger:
+    transports:
+      temporal: 'temporal://default'                 # очередь из rr_workers.temporal.default_queue
+      temporal_heavy: 'temporal://heavy?tag=report'  # очередь heavy, workflow id "report-..."
+    routing:
+      App\Message\SendEmail: temporal
+      App\Message\BuildReport: temporal_heavy
+```
+
+DSN: `temporal://<queue>?tag=<tag>`.
+
+* `queue` — task queue; `default` или пусто (`temporal://`) — `rr_workers.temporal.default_queue`.
+  Другая очередь должна быть объявлена в `rr_workers.temporal.workers`, иначе её никто не слушает.
+* `tag` — префикс workflow id (по умолчанию `messenger`), удобно искать в Temporal UI.
+
+Фабрика транспорта регистрируется автоматически (autoconfigure, тег `messenger.transport_factory`).
+
+### Отправка
+
+```php
+use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\Stamp\DelayStamp;
+use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
+
+public function __construct(private MessageBusInterface $bus) {}
+
+// сразу
+$this->bus->dispatch(new SendEmail(42));
+
+// с задержкой 5 минут (миллисекунды)
+$this->bus->dispatch(new SendEmail(42), [new DelayStamp(300_000)]);
+$this->bus->dispatch(new SendEmail(42), [DelayStamp::delayFor(new \DateInterval('PT5M'))]);
+
+// workflow id запущенной задачи
+$workflowId = $this->bus->dispatch(new SendEmail(42))
+    ->last(TransportMessageIdStamp::class)?->getId();
+```
+
+### Что происходит
+
+1. Транспорт вызывает `TemporalJobDispatcher::dispatch()` — стартует `MessengerWorkflow` в нужной очереди;
+   `DelayStamp` уходит в `WorkflowOptions::withWorkflowStartDelay()`.
+2. Temporal-воркер выполняет `MessengerActivity`: денормализует сообщение и синхронно вызывает handler.
+   Envelope помечается `ReceivedStamp`, поэтому сообщение не уходит в транспорт повторно.
+3. Упал handler — activity ретраится по `rr_workers.temporal.activity`.
+
+`messenger:consume temporal` запускать не нужно — сообщения забирает temporal-воркер.
+
+### Требования и ограничения
+
+* Handler должен существовать в приложении, где работает temporal-воркер.
+* Сообщение нормализуется Symfony Serializer: без замыканий, ресурсов, Doctrine-прокси (передавайте id).
+* Только fire-and-forget. Нужен результат — `JobDispatcherInterface::dispatch(returnResult: true)`.
+* `serializer`, `retry_strategy`, `failure_transport` транспорта Messenger не действуют:
+  payload нормализует `TemporalJobDispatcher`, ретраями управляет Temporal.
+* Задержка без Messenger — только через `TemporalJobDispatcher::dispatch(..., delayMs: 5000)`,
+  в `JobDispatcherInterface` параметра нет.
+
+### Что выбрать
+
+| Нужно | Чем |
+|---|---|
+| Fire-and-forget, обычный роутинг Messenger | транспорт `temporal://` |
+| Дождаться результата | `JobDispatcherInterface::dispatch(returnResult: true)` |
+| Пачка команд параллельно | `JobDispatcherInterface::dispatchPool()` |
+| По расписанию | `CronMap` + `temporal:schedule:upsert` |
+
 ## Cron / расписания
 
 Реализуйте `CronMapInterface` и перекройте дефолтный `CronMap` (он возвращает пустой список):
@@ -157,6 +233,7 @@ php bin/console temporal:schedule:upsert
 | `Services/Workflows/` | `MessengerWorkflow` (одна команда), `MessengerPoolWorkflow` (пачка) |
 | `Services/Activities/MessengerActivity.php` | денормализация + Messenger bus |
 | `Services/JobsDispatcher/` | `TemporalJobDispatcher` — точка входа для приложения |
+| `SymfonyIntegration/Messenger/` | Messenger-транспорт `temporal://` и его фабрика |
 | `Services/Cron/` | `CronJob`, дефолтный пустой `CronMap` |
 | `Commands/` | `temporal:schedule:upsert` |
 | `../Workers/TemporalWorker.php` | сам воркер, регистрация очередей |

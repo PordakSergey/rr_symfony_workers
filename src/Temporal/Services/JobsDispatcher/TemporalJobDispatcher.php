@@ -36,18 +36,22 @@ class TemporalJobDispatcher implements JobDispatcherInterface
      * @param bool $returnResult
      * @param string $tag
      * @param string|null $queue
+     * @param int $delayMs Отложенный старт workflow (Messenger DelayStamp), 0 — сразу
      * @return JobResponse
      * @throws ExceptionInterface
      */
-    public function dispatch(object $command, bool $returnResult = false, string $tag = 'messenger', ?string $queue = null): JobResponse
+    public function dispatch(object $command, bool $returnResult = false, string $tag = 'messenger', ?string $queue = null, int $delayMs = 0): JobResponse
     {
-        $workflow = $this->client->newWorkflowStub(
-            MessengerWorkflow::class,
-            WorkflowOptions::new()
-                ->withTaskQueue($queue ?? $this->taskQueue)
-                ->withWorkflowId($tag. '-' . uniqid())
-                ->withRetryOptions($this->retryOptions())
-        );
+        $options = WorkflowOptions::new()
+            ->withTaskQueue($queue ?? $this->taskQueue)
+            ->withWorkflowId($tag. '-' . uniqid())
+            ->withRetryOptions($this->retryOptions());
+
+        if ($delayMs > 0) {
+            $options = $options->withWorkflowStartDelay(CarbonInterval::milliseconds($delayMs)->cascade());
+        }
+
+        $workflow = $this->client->newWorkflowStub(MessengerWorkflow::class, $options);
 
         $payload = $this->serializer->normalize($command, 'json');
 
